@@ -1,0 +1,8 @@
+Keegan Kochis
+831455801
+kkochis@rams.colostate.edu
+(913) 952-4882
+
+COMPILATION INSTRUCTIONS
+
+EXECUTION INSTRUCTIONS
