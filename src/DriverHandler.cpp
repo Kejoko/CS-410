@@ -6,15 +6,22 @@
 #include <iostream>
 #include <string>
 
+#include <Eigen/Dense>
+
 #include "DriverHandler.h"
 
 DriverHandler::DriverHandler(const std::string& fileName) {
     mFileName = fileName;
-    //mTransformMatrix = 4x4 identity matrix
+    mTransformationMatrix <<    1, 0, 0, 0,
+                                0, 1, 0, 0,
+                                0, 0, 1, 0,
+                                0, 0, 0, 1;
     //mObjects = blank vector
 }
 
 void DriverHandler::read_driver() {
+    std::cout << mTransformationMatrix << '\n';
+    
     std::ifstream driverStream(mFileName);
     std::string line;
     
