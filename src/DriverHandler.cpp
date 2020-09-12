@@ -6,21 +6,22 @@
 #include <iostream>
 #include <string>
 
+#include <Eigen/Dense>
+
 #include "DriverHandler.h"
 
-/*
- Initialize the driver file name to be the name specified. Initialize the transformation
- matrix to be a 4x4 identity matrix. Initialize the vector of objects to be empty.
-*/
 DriverHandler::DriverHandler(const std::string& fileName) {
     mFileName = fileName;
+    mTransformationMatrix <<    1, 0, 0, 0,
+                                0, 1, 0, 0,
+                                0, 0, 1, 0,
+                                0, 0, 0, 1;
+    //mObjects = blank vector
 }
 
-/*
- This method is responsible for opening the driver file, reading the lines and handling
- them properly, then closing the file.
-*/
 void DriverHandler::read_driver() {
+    std::cout << mTransformationMatrix << '\n';
+    
     std::ifstream driverStream(mFileName);
     std::string line;
     
@@ -36,25 +37,14 @@ void DriverHandler::read_driver() {
     driverStream.close();
 }
 
-/*
- This method performs operations on the transformation matrix according to the contents
- of the line from the driver.
-*/
 void DriverHandler::update_matrix(const std::string& line) {
     std::cout << line << '\n';
 }
 
-/*
- This method loads and creates an object from the specified object file then applies the
- transformation matrix to all of its vertices.
-*/
 void DriverHandler::load_object(const std::string& line) {
     std::cout << line << '\n';
 }
 
-/*
- This method saves the object to the file specified by the driver line.
-*/
 void DriverHandler::save_object(const std::string& line) {
     std::cout << line << '\n';
 }

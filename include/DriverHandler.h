@@ -8,6 +8,8 @@
 #include <string>
 #include <vector>
 
+#include <Eigen/Dense>
+
 /*
  This class is responsible for reading lines from the driver file and handling
  them properly. It has a member variable representing the transformation
@@ -20,7 +22,7 @@ public:
     DriverHandler(const std::string& fileName);
     
     std::string mFileName;
-    //4x4 matrix type mTransformationMatrix;
+    Eigen::Matrix4d mTransformationMatrix;
     //std::vector<object type> mObjects;
     
     void read_driver();
