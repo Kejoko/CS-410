@@ -3,16 +3,13 @@
 // kkochis@rams.colostate.edu
 
 #include <iostream>
-#include <fstream>
 
-int main (int argv, char** argc) {
+#include "DriverHandler.h"
+
+int main (int argc, char** argv) {
     std::cout << "Hello, world!\n";
     
-    // Open file
-    
-    // Read in lines from file and handle accordingly
-    
-    // Close file
+    DriverHandler DH(argv[1]);
     
     return 0;
 }
