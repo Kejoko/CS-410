@@ -1,0 +1,17 @@
+# Files to ignore for CS 410
+
+# Directory where all builds will be performed
+build/
+
+# CMake files just in case
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Testing
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps
