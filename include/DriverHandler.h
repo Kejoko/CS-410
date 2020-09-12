@@ -24,8 +24,10 @@ public:
     //std::vector<object type> mObjects;
     
     void read_driver();
-    //void update_matrix(const std::string& line);
-    //void update_objects(const std::string& line);
+    void update_matrix(const std::string& line);
+    void load_object(const std::string& line);
+    void update_objects();
+    void save_object(const std::string& line);
 };
 
 #endif //DRIVER_HANDLER_H

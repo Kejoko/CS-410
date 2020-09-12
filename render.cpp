@@ -2,14 +2,12 @@
 // 831455801
 // kkochis@rams.colostate.edu
 
-#include <iostream>
-
 #include "DriverHandler.h"
 
 int main (int argc, char** argv) {
-    std::cout << "Hello, world!\n";
     
     DriverHandler DH(argv[1]);
+    DH.read_driver();
     
     return 0;
 }
