@@ -26,7 +26,6 @@ public:
     void read_driver();
     void update_matrix(const std::string& line);
     void load_object(const std::string& line);
-    void update_objects();
     void save_object(const std::string& line);
 };
 
