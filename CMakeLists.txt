@@ -22,16 +22,22 @@ include_directories(
 # Include project libraries
 #======================================================================
 include_directories(
-  ${PROJECT_SOURCE_DIR}/src)
+  ${PROJECT_SOURCE_DIR}/include)
 
 #======================================================================
 # Subdirectories
 #======================================================================
 add_subdirectory(dependencies)
-add_subdirectory(include)
 add_subdirectory(src)
 
-#=======================================s===============================
+#======================================================================
 # Entry Point
 #======================================================================
+list(APPEND LIBS DriverHandler)
+
 add_executable(render render.cpp)
+
+target_link_libraries(
+  render
+  PRIVATE
+  ${LIBS})
