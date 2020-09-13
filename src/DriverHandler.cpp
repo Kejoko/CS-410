@@ -39,8 +39,6 @@ void DriverHandler::read_driver() {
 }
 
 void DriverHandler::update_matrix(const std::string& line) {
-    std::cout << line << '\n';
-    
     if (line == "clear") {
         mTransformationMatrix <<    1, 0, 0, 0,
                                     0, 1, 0, 0,
@@ -65,10 +63,8 @@ void DriverHandler::update_matrix(const std::string& line) {
             double theta;
             infoStream >> theta;
             
-            //Calculate Rz, the rotation matrix about the z axis
-            
             Eigen::Vector3d W(x, y, z);
-            W = W / sqrt(x*x + y*y + z*z);
+            W /= W.norm();
             
             Eigen::Vector3d M = W;
             if (M(0) < M(1) && M(0) < M(2))
@@ -77,9 +73,12 @@ void DriverHandler::update_matrix(const std::string& line) {
                 M(1) = 1;
             else if (M(2) < M(0) && M(2) < M(1))
                 M(2) = 1;
-            M = M / sqrt( M(0)*M(0) + M(1)*M(1) + M(2)*M(2) );
+            else
+                M(2) = 1;
+            //M /= M.norm();
             
             Eigen::Vector3d U = W.cross(M);
+            U /= U.norm();
             
             Eigen::Vector3d V = W.cross(U);
             
@@ -89,9 +88,15 @@ void DriverHandler::update_matrix(const std::string& line) {
                     W(0), W(1), W(2), 0,
                        0,    0,    0, 1;
             
-            //Calculate Rt
+            Eigen::Matrix4d Rz;
+            double ct = cos((theta / 180.0) * M_PI);
+            double st = sin((theta / 180.0) * M_PI);
+            Rz <<   ct, -st, 0, 0,
+                    st,  ct, 0, 0,
+                     0,   0, 1, 0,
+                     0,   0, 0, 1;
             
-            //modifer = Rt * Rz * Rw
+            modifier = Rw.transpose() * Rz * Rw;
         }
         else if (type == "scale") {
             modifier << x, 0, 0, 0,
@@ -100,10 +105,8 @@ void DriverHandler::update_matrix(const std::string& line) {
                         0, 0, 0, 1;
         }
         
-        mTransformationMatrix = mTransformationMatrix * modifier;
+        mTransformationMatrix = modifier * mTransformationMatrix;
     }
-    
-    std::cout << mTransformationMatrix << '\n';
 }
 
 void DriverHandler::load_object(const std::string& line) {
