@@ -8,6 +8,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <vector>
 
 #include <Eigen/Dense>
 
@@ -108,7 +109,7 @@ void DriverHandler::update_matrix(const std::string& line) {
 }
 
 void DriverHandler::load_object(const std::string& line) {
-    std::cout << line << '\n';
+    mObjects.emplace_back(line, mTransformationMatrix);
 }
 
 void DriverHandler::save_object(const std::string& line) {
