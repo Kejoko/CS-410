@@ -75,7 +75,6 @@ void DriverHandler::update_matrix(const std::string& line) {
                 M(2) = 1;
             else
                 M(2) = 1;
-            //M /= M.norm();
             
             Eigen::Vector3d U = W.cross(M);
             U /= U.norm();
