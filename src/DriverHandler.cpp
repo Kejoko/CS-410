@@ -19,7 +19,6 @@ DriverHandler::DriverHandler(const std::string& fileName) {
                                 0, 1, 0, 0,
                                 0, 0, 1, 0,
                                 0, 0, 0, 1;
-    //mObjects = blank vector
 }
 
 void DriverHandler::read_driver() {

@@ -32,7 +32,7 @@ add_subdirectory(src)
 #======================================================================
 # Entry Point
 #======================================================================
-list(APPEND LIBS DriverHandler)
+list(APPEND LIBS DriverHandler Object)
 
 add_executable(render render.cpp)
 

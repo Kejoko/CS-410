@@ -10,6 +10,8 @@
 
 #include <Eigen/Dense>
 
+#include "Object.h"
+
 /*
  This class is responsible for reading lines from the driver file and handling
  them properly. It has a member variable representing the transformation
@@ -23,7 +25,7 @@ public:
     
     std::string mFileName;
     Eigen::Matrix4d mTransformationMatrix;
-    //std::vector<object type> mObjects;
+    std::vector<Object> mObjects;
     
     void read_driver();
     void update_matrix(const std::string& line);
