@@ -2,7 +2,7 @@
 # Keegan Kochis
 # kkochis@rams.colostate.edu
 #======================================================================
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.11)
 project(Graphics VERSION 0.1 LANGUAGES CXX)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
