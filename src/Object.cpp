@@ -37,7 +37,12 @@ Object::Object(const std::string& fileName, const Eigen::Matrix4d& transformatio
 }
 
 void Object::handle_vertex(const std::string& info, const Eigen::Matrix4d& transformationMatrix) {
-    std::cout << "V " << info << '\n';
+    double x, y, z;
+    std::istringstream infoStream(info);
+    infoStream >> x >> y >> z;
+    mVertices.emplace_back(x, y, z, 1.0);
+    mVertices.back() = transformationMatrix * mVertices.back();
+    std::cout << mVertices.back() << "\n\n";
 }
 
 void Object::handle_vertex_normal(const std::string& info) {
