@@ -22,6 +22,10 @@ DriverHandler::DriverHandler(const std::string& fileName) {
                                 0, 0, 0, 1;
 }
 
+
+
+
+
 void DriverHandler::read_driver() {
     std::ifstream driverStream(mFileName);
     std::string line;
@@ -37,6 +41,10 @@ void DriverHandler::read_driver() {
     
     driverStream.close();
 }
+
+
+
+
 
 void DriverHandler::update_matrix(const std::string& line) {
     if (line == "clear") {
@@ -108,9 +116,17 @@ void DriverHandler::update_matrix(const std::string& line) {
     }
 }
 
+
+
+
+
 void DriverHandler::load_object(const std::string& line) {
     mObjects.emplace_back(line, mTransformationMatrix);
 }
+
+
+
+
 
 void DriverHandler::save_object(const std::string& line) {
     std::cout << line << '\n';

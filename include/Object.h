@@ -28,14 +28,18 @@ public:
     std::string mFileName;
     std::vector<Eigen::Vector4d> mVertices;
     std::vector<Eigen::Vector4d> mVertexNormals;
-    std::vector<std::array<double, 9>> mFaces;
+    std::vector<std::array<int, 9>> mFaces;
+    //std::vector<int (*) [9]> mFaces;
+    //std::vector<int*> mFaces;
     std::string mSmoothing;
     std::vector<int> mLine;
     
     void handle_vertex(const std::string& info, const Eigen::Matrix4d& transformationMatrix);
-    void handle_vertex_normal(const std::string& info);
+    void handle_vertex_normal(const std::string& info, const Eigen::Matrix4d& transformationMatrix);
     void handle_smoothing(const std::string& info);
     void handle_face(const std::string& info);
+    
+    void output(const std::string& fileName);
 };
 
 #endif //OBJECT_H
