@@ -9,6 +9,8 @@
    loaded? If so, how do we know which order to save them? On the first save command should
    we save the first obj file that was loaded?
  - Do we need to store the smoothing directive, textures, and material information?
+ - Do we not need to report the vertex normals?
+ - Can we assume faces will always be in the order of v1//vn1 v2//vn2 v3//vn3?
 */
 
 #ifndef OBJECT_H

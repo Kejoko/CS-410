@@ -129,5 +129,7 @@ void DriverHandler::load_object(const std::string& line) {
 
 
 void DriverHandler::save_object(const std::string& line) {
-    std::cout << line << '\n';
+    Object obj = mObjects[0];
+    mObjects.erase(mObjects.begin());
+    obj.output(line);
 }

@@ -98,8 +98,42 @@ void Object::handle_face(const std::string& info) {
 
 
 
-/*
+
 void Object::output(const std::string& fileName) {
+    std::ofstream outFile(fileName);
     
+    outFile << "# Blender v2.79 (sub 0) OBJ File: ''\n";
+    outFile << "# www.blender.org\n";
+    
+    for (size_t i = 0; i < mVertices.size(); i++) {
+        outFile << "v " << std::ios::fixed << std::setprecision(6)
+                << std::to_string(mVertices[i](0)) << ' '
+                << std::to_string(mVertices[i](1)) << ' '
+                << std::to_string(mVertices[i](2)) << '\n';
+    }
+    
+    /*
+    for (size_t i = 0; i < mVertexNormals.size(); i++) {
+        
+    }
+    */
+    
+    outFile << "s " << mSmoothing << '\n';
+    
+    int value;
+    for (size_t i = 0; i < mFaces.size(); i++) {
+        outFile << "f " << std::resetiosflags(std::ios::showbase);
+        
+        for (int j = 0; j < 9; j++) {
+            value = mFaces[i][j];
+            if (value != 0) outFile << value;
+            
+            if ((j == 0 || j == 1) || (j == 3 || j==4) || (j == 6 || j == 7)) outFile << '/';
+            else if (j == 2 || j == 5) outFile << ' ';
+            else outFile << '\n';
+        }
+    }
+    
+    outFile.close();
 }
-*/
+
