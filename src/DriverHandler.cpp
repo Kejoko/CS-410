@@ -8,6 +8,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <vector>
 
 #include <Eigen/Dense>
 
@@ -19,8 +20,11 @@ DriverHandler::DriverHandler(const std::string& fileName) {
                                 0, 1, 0, 0,
                                 0, 0, 1, 0,
                                 0, 0, 0, 1;
-    //mObjects = blank vector
 }
+
+
+
+
 
 void DriverHandler::read_driver() {
     std::ifstream driverStream(mFileName);
@@ -37,6 +41,10 @@ void DriverHandler::read_driver() {
     
     driverStream.close();
 }
+
+
+
+
 
 void DriverHandler::update_matrix(const std::string& line) {
     if (line == "clear") {
@@ -108,9 +116,17 @@ void DriverHandler::update_matrix(const std::string& line) {
     }
 }
 
+
+
+
+
 void DriverHandler::load_object(const std::string& line) {
-    std::cout << line << '\n';
+    mObjects.emplace_back(line, mTransformationMatrix);
 }
+
+
+
+
 
 void DriverHandler::save_object(const std::string& line) {
     std::cout << line << '\n';

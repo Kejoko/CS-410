@@ -12,6 +12,8 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+set(CMAKE_CXX_FLAGS "-Wall -Werror -Wextra -Wpedantic")
+
 #======================================================================
 # Include project dependencies
 #======================================================================
@@ -32,7 +34,7 @@ add_subdirectory(src)
 #======================================================================
 # Entry Point
 #======================================================================
-list(APPEND LIBS DriverHandler)
+list(APPEND LIBS DriverHandler Object)
 
 add_executable(render render.cpp)
 
