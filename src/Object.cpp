@@ -98,7 +98,8 @@ void Object::handle_face(const std::string& info) {
 
 
 
-
+/*
 void Object::output(const std::string& fileName) {
     
 }
+*/

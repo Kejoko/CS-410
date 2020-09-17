@@ -29,8 +29,6 @@ public:
     std::vector<Eigen::Vector4d> mVertices;
     std::vector<Eigen::Vector4d> mVertexNormals;
     std::vector<std::array<int, 9>> mFaces;
-    //std::vector<int (*) [9]> mFaces;
-    //std::vector<int*> mFaces;
     std::string mSmoothing;
     std::vector<int> mLine;
     
