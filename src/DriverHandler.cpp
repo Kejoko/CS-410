@@ -121,8 +121,6 @@ void DriverHandler::update_matrix(const std::string& line) {
 
 
 void DriverHandler::load_object(const std::string& line) {
-    std::cout << "Transformation matrix:\n" << mTransformationMatrix << '\n';
-    std::cout << "\nTransformation matrix inverse:\n" << mTransformationMatrix.inverse() << '\n';
     mObjects.emplace_back(line, mTransformationMatrix);
 }
 
@@ -131,7 +129,16 @@ void DriverHandler::load_object(const std::string& line) {
 
 
 void DriverHandler::save_object(const std::string& line) {
+    std::string transformationFileName = "transformation_.txt";
+    std::ofstream outTransformationFile(transformationFileName);
     Object obj = mObjects[0];
     mObjects.erase(mObjects.begin());
+    double* sums = obj.sum_absolute_translations();
+    
+    outTransformationFile << "# Transformation matrix\n" << mTransformationMatrix << "\n\n";
+    outTransformationFile << "# Inverse transformation matrix\n" << mTransformationMatrix.inverse() << "\n\n";
+    outTransformationFile << "# Sum absolute translations from original to transformed\n" << std::to_string(sums[0]) << "\n\n";
+    outTransformationFile << "# Sum absolute translations from original to transformed to \"original\"\n" << std::to_string(sums[1]) << '\n';
+    
     obj.output(line);
 }

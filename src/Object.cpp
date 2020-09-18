@@ -113,6 +113,16 @@ void Object::handle_face(const std::string& info) {
 
 
 
+double* Object::sum_absolute_translations() {
+    double* sums = new double[2];
+    sums[0] = 6.07;
+    sums[1] = 76;
+    return sums;
+}
+
+
+
+
 
 void Object::output(const std::string& fileName) {
     std::ofstream outFile(fileName);

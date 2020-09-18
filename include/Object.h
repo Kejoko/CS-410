@@ -41,6 +41,7 @@ public:
     void handle_smoothing(const std::string& info);
     void handle_face(const std::string& info);
     
+    double* sum_absolute_translations();
     void output(const std::string& fileName);
 };
 
