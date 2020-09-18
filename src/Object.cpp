@@ -139,13 +139,20 @@ void Object::output(const std::string& fileName) {
     for (size_t i = 0; i < mFaces.size(); i++) {
         outFile << "f " << std::resetiosflags(std::ios::showbase);
         
-        for (int j = 0; j < 9; j++) {
-            value = mFaces[i][j];
-            if (value != 0) outFile << value;
-            
-            if ((j == 0 || j == 1) || (j == 3 || j==4) || (j == 6 || j == 7)) outFile << '/';
-            else if (j == 2 || j == 5) outFile << ' ';
-            else outFile << '\n';
+        if (mFaces[i][2] == 0 && mFaces[i][5] == 0 && mFaces[i][8] == 0) {
+            outFile << mFaces[i][0] << ' '
+                    << mFaces[i][3] << ' '
+                    << mFaces[i][6] << '\n';
+        }
+        else {
+            for (int j = 0; j < 9; j++) {
+                value = mFaces[i][j];
+                if (value != 0) outFile << value;
+                
+                if ((j == 0 || j == 1) || (j == 3 || j==4) || (j == 6 || j == 7)) outFile << '/';
+                else if (j == 2 || j == 5) outFile << ' ';
+                else outFile << '\n';
+            }
         }
     }
     
