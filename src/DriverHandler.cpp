@@ -121,6 +121,8 @@ void DriverHandler::update_matrix(const std::string& line) {
 
 
 void DriverHandler::load_object(const std::string& line) {
+    std::cout << "Transformation matrix:\n" << mTransformationMatrix << '\n';
+    std::cout << "\nTransformation matrix inverse:\n" << mTransformationMatrix.inverse() << '\n';
     mObjects.emplace_back(line, mTransformationMatrix);
 }
 
