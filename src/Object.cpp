@@ -78,18 +78,33 @@ void Object::handle_smoothing(const std::string& info) {
 
 void Object::handle_face(const std::string& info) {
     std::istringstream infoStream(info);
-    std::string face, token;
-    int index = 0;
+    std::string index, token;
+    int i = 0, tokenCount = 0;
     
     std::array<int, 9> faceValues;
     
-    while(getline(infoStream, face, ' ')) {
-        std::istringstream secondaryStream(face);
+    while(getline(infoStream, index, ' ')) {
+        std::istringstream secondaryStream(index);
         
         while(getline(secondaryStream, token, '/')) {
-            faceValues[index] = (token.empty()) ? 0 : std::stoi(token);
-            index++;
+            faceValues[i] = (token.empty()) ? 0 : std::stoi(token);
+            i++;
+            tokenCount++;
         }
+    }
+    
+    if (tokenCount == 3) {
+        faceValues[3] = faceValues[1];
+        faceValues[6] = faceValues[2];
+        
+        faceValues[1] = 0;
+        faceValues[2] = 0;
+        
+        faceValues[4] = 0;
+        faceValues[5] = 0;
+        
+        faceValues[7] = 0;
+        faceValues[8] = 0;
     }
     
     mFaces.push_back(faceValues);
