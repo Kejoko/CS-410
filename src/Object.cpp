@@ -14,9 +14,10 @@
 #include "Object.h"
 
 Object::Object(const std::string& fileName, const Eigen::Matrix4d& transformationMatrix) {
-    mFileName = fileName;
+    std::istringstream fileNameStream(fileName);
+    fileNameStream >> mFileName;
     
-    std::ifstream objReader(fileName);
+    std::ifstream objReader(mFileName);
     std::string line, word;
     std::istringstream infoStream;
     
@@ -163,7 +164,7 @@ void Object::output(const std::string& fileName) {
     outFile << "# www.blender.org\n";
     
     for (size_t i = 0; i < mVertices.size(); i++) {
-        outFile << "v " << std::ios::fixed << std::setprecision(6)
+        outFile << "v "
                 << std::to_string(mVertices[i](0)) << ' '
                 << std::to_string(mVertices[i](1)) << ' '
                 << std::to_string(mVertices[i](2)) << '\n';
