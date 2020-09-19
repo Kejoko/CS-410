@@ -32,11 +32,11 @@ void DriverHandler::read_driver() {
     
     while(getline(driverStream, line)) {
         if (line.substr(0,5) == "trans")
-            update_matrix(line.substr(6, line.length() - 6));
+            update_matrix(line.substr(6, std::string::npos));
         else if (line.substr(0,4) == "load")
-            load_object(line.substr(5, line.length() - 5));
+            load_object(line.substr(5, std::string::npos));
         else if (line.substr(0,4) == "save")
-            save_object(line.substr(5, line.length() - 5));
+            save_object(line.substr(5, std::string::npos));
     }
     
     driverStream.close();
