@@ -129,10 +129,28 @@ void DriverHandler::load_object(const std::string& line) {
 
 
 void DriverHandler::save_object(const std::string& line) {
-    std::string transformationFileName = "transformation_.txt";
+    std::string transformationFileName;
+    
+    size_t period = line.find('.');
+    if (period != std::string::npos) {
+        transformationFileName = line.substr(0, period+1) + "txt";
+    }
+    else {
+        transformationFileName = line + ".txt";
+    }
+    
+    size_t underscore = line.find('_');
+    if (underscore != std::string::npos) {
+        std::string end = transformationFileName.substr(underscore, std::string::npos);
+        transformationFileName = transformationFileName.substr(0, underscore) + "_transform" + end;
+    }
+    else {
+        transformationFileName = line.substr(0, period) + "_transform.txt";
+    }
+    
     std::ofstream outTransformationFile(transformationFileName);
     Object obj = mObjects[0];
-    mObjects.erase(mObjects.begin());\
+    mObjects.erase(mObjects.begin());
     
     outTransformationFile << "# Transformation matrix\n" << mTransformationMatrix << "\n\n";
     outTransformationFile << "# Sum absolute translations from original to transformed\n" << std::to_string(obj.sum_absolute_translations()) << "\n\n";
