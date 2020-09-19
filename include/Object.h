@@ -35,12 +35,13 @@ public:
     std::vector<Eigen::Vector4d> mVertexNormals;
     std::vector<std::array<int, 9>> mFaces;
     std::string mSmoothing;
-    std::vector<int> mLine;
+    std::vector<std::vector<int>> mLines;
     
     void handle_vertex(const std::string& info, const Eigen::Matrix4d& transformationMatrix);
     void handle_vertex_normal(const std::string& info, const Eigen::Matrix4d& transformationMatrix);
     void handle_smoothing(const std::string& info);
     void handle_face(const std::string& info);
+    void handle_line(const std::string& info);
     
     double sum_absolute_translations();
     void output(const std::string& fileName);

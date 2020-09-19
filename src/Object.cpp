@@ -21,7 +21,7 @@ Object::Object(const std::string& fileName, const Eigen::Matrix4d& transformatio
     std::istringstream infoStream;
     
     while(getline(objReader, line)) {
-        if (line.substr(0,1) == "v" && line.substr(0,2) != "vn" && line.substr(0,2) != "vt") {
+        if (line.substr(0,1) == "v" && line.substr(0,2) != "vn" && line.substr(0,2) != "vp" && line.substr(0,2) != "vt") {
             handle_vertex(line.substr(2, std::string::npos), transformationMatrix);
         }
         else if (line.substr(0,2) == "vn") {
@@ -32,6 +32,9 @@ Object::Object(const std::string& fileName, const Eigen::Matrix4d& transformatio
         }
         else if (line.substr(0,1) == "f") {
             handle_face(line.substr(2, std::string::npos));
+        }
+        else if (line.substr(0,1) == "l") {
+            handle_line(line.substr(2, std::string::npos));
         }
     }
     
@@ -116,6 +119,22 @@ void Object::handle_face(const std::string& info) {
 
 
 
+void Object::handle_line(const std::string& info) {
+    std::vector<int> line;
+    std::istringstream infoStream(info);
+    int index;
+    
+    while (infoStream >> index) {
+        line.push_back(index);
+    }
+    
+    mLines.push_back(line);
+}
+
+
+
+
+
 double Object::sum_absolute_translations() {
     double sum = 0;
     double difference, xDiff, yDiff, zDiff;
@@ -177,6 +196,16 @@ void Object::output(const std::string& fileName) {
                 else outFile << '\n';
             }
         }
+    }
+    
+    for (size_t i = 0; i < mLines.size(); i++) {
+        outFile << "l ";
+        for (size_t j = 0; j < mLines[i].size(); j++) {
+            outFile << mLines[i][j];
+            if (j != mLines[i].size() - 1)
+                outFile << ' ';
+        }
+        outFile << '\n';
     }
     
     outFile.close();
