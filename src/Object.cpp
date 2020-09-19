@@ -163,7 +163,7 @@ void Object::output(const std::string& fileName) {
     outFile << "# www.blender.org\n";
     
     for (size_t i = 0; i < mVertices.size(); i++) {
-        outFile << "v " << std::ios::fixed << std::setprecision(6)
+        outFile << "v "
                 << std::to_string(mVertices[i](0)) << ' '
                 << std::to_string(mVertices[i](1)) << ' '
                 << std::to_string(mVertices[i](2)) << '\n';
