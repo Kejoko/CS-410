@@ -14,9 +14,10 @@
 #include "Object.h"
 
 Object::Object(const std::string& fileName, const Eigen::Matrix4d& transformationMatrix) {
-    mFileName = fileName;
+    std::istringstream fileNameStream(fileName);
+    fileNameStream >> mFileName;
     
-    std::ifstream objReader(fileName);
+    std::ifstream objReader(mFileName);
     std::string line, word;
     std::istringstream infoStream;
     
