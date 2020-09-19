@@ -30,6 +30,7 @@ public:
     Object(const std::string& fileName, const Eigen::Matrix4d& transformationMatrix);
     
     std::string mFileName;
+    std::vector<Eigen::Vector4d> mOldVertices;
     std::vector<Eigen::Vector4d> mVertices;
     std::vector<Eigen::Vector4d> mVertexNormals;
     std::vector<std::array<int, 9>> mFaces;
@@ -41,7 +42,7 @@ public:
     void handle_smoothing(const std::string& info);
     void handle_face(const std::string& info);
     
-    double* sum_absolute_translations();
+    double sum_absolute_translations();
     void output(const std::string& fileName);
 };
 

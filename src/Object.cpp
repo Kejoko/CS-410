@@ -2,6 +2,8 @@
 // 831455801
 // kkochis@rams.colostate.edu
 
+#include <math.h>
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -45,6 +47,7 @@ void Object::handle_vertex(const std::string& info, const Eigen::Matrix4d& trans
     double x, y, z;
     
     infoStream >> x >> y >> z;
+    mOldVertices.emplace_back(x, y, z, 1.0);
     mVertices.emplace_back(x, y, z, 1.0);
     
     mVertices.back() = transformationMatrix * mVertices.back();
@@ -113,11 +116,21 @@ void Object::handle_face(const std::string& info) {
 
 
 
-double* Object::sum_absolute_translations() {
-    double* sums = new double[2];
-    sums[0] = 6.07;
-    sums[1] = 76;
-    return sums;
+double Object::sum_absolute_translations() {
+    double sum = 0;
+    double difference, xDiff, yDiff, zDiff;
+    
+    for (size_t i = 0; i < mVertices.size(); i++) {
+        
+        xDiff = fabs(mVertices[i](0) - mOldVertices[i](0));
+        yDiff = fabs(mVertices[i](1) - mOldVertices[i](1));
+        zDiff = fabs(mVertices[i](2) - mOldVertices[i](2));
+        difference = xDiff + yDiff + zDiff;
+        
+        sum += difference;
+    }
+    
+    return sum;
 }
 
 

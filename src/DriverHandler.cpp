@@ -132,13 +132,10 @@ void DriverHandler::save_object(const std::string& line) {
     std::string transformationFileName = "transformation_.txt";
     std::ofstream outTransformationFile(transformationFileName);
     Object obj = mObjects[0];
-    mObjects.erase(mObjects.begin());
-    double* sums = obj.sum_absolute_translations();
+    mObjects.erase(mObjects.begin());\
     
     outTransformationFile << "# Transformation matrix\n" << mTransformationMatrix << "\n\n";
-    outTransformationFile << "# Inverse transformation matrix\n" << mTransformationMatrix.inverse() << "\n\n";
-    outTransformationFile << "# Sum absolute translations from original to transformed\n" << std::to_string(sums[0]) << "\n\n";
-    outTransformationFile << "# Sum absolute translations from original to transformed to \"original\"\n" << std::to_string(sums[1]) << '\n';
+    outTransformationFile << "# Sum absolute translations from original to transformed\n" << std::to_string(obj.sum_absolute_translations()) << "\n\n";
     
     obj.output(line);
 }
