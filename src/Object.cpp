@@ -2,6 +2,8 @@
 // 831455801
 // kkochis@rams.colostate.edu
 
+#include <math.h>
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -45,6 +47,7 @@ void Object::handle_vertex(const std::string& info, const Eigen::Matrix4d& trans
     double x, y, z;
     
     infoStream >> x >> y >> z;
+    mOldVertices.emplace_back(x, y, z, 1.0);
     mVertices.emplace_back(x, y, z, 1.0);
     
     mVertices.back() = transformationMatrix * mVertices.back();
@@ -113,8 +116,69 @@ void Object::handle_face(const std::string& info) {
 
 
 
-/*
-void Object::output(const std::string& fileName) {
+double Object::sum_absolute_translations() {
+    double sum = 0;
+    double difference, xDiff, yDiff, zDiff;
     
+    for (size_t i = 0; i < mVertices.size(); i++) {
+        
+        xDiff = fabs(mVertices[i](0) - mOldVertices[i](0));
+        yDiff = fabs(mVertices[i](1) - mOldVertices[i](1));
+        zDiff = fabs(mVertices[i](2) - mOldVertices[i](2));
+        difference = xDiff + yDiff + zDiff;
+        
+        sum += difference;
+    }
+    
+    return sum;
 }
-*/
+
+
+
+
+
+void Object::output(const std::string& fileName) {
+    std::ofstream outFile(fileName);
+    
+    outFile << "# Blender v2.79 (sub 0) OBJ File: ''\n";
+    outFile << "# www.blender.org\n";
+    
+    for (size_t i = 0; i < mVertices.size(); i++) {
+        outFile << "v " << std::ios::fixed << std::setprecision(6)
+                << std::to_string(mVertices[i](0)) << ' '
+                << std::to_string(mVertices[i](1)) << ' '
+                << std::to_string(mVertices[i](2)) << '\n';
+    }
+    
+    /*
+    for (size_t i = 0; i < mVertexNormals.size(); i++) {
+        
+    }
+    */
+    
+    outFile << "s " << mSmoothing << '\n';
+    
+    int value;
+    for (size_t i = 0; i < mFaces.size(); i++) {
+        outFile << "f " << std::resetiosflags(std::ios::showbase);
+        
+        if (mFaces[i][2] == 0 && mFaces[i][5] == 0 && mFaces[i][8] == 0) {
+            outFile << mFaces[i][0] << ' '
+                    << mFaces[i][3] << ' '
+                    << mFaces[i][6] << '\n';
+        }
+        else {
+            for (int j = 0; j < 9; j++) {
+                value = mFaces[i][j];
+                if (value != 0) outFile << value;
+                
+                if ((j == 0 || j == 1) || (j == 3 || j==4) || (j == 6 || j == 7)) outFile << '/';
+                else if (j == 2 || j == 5) outFile << ' ';
+                else outFile << '\n';
+            }
+        }
+    }
+    
+    outFile.close();
+}
+
