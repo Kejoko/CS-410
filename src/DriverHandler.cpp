@@ -75,12 +75,35 @@ void DriverHandler::update_matrix(const std::string& line) {
             W /= W.norm();
             
             Eigen::Vector3d M = W;
-            if (M(0) < M(1) && M(0) < M(2))
-                M(0) = 1;
-            else if (M(1) < M(0) && M(1) < M(2))
-                M(1) = 1;
-            else if (M(2) < M(0) && M(2) < M(1))
-                M(2) = 1;
+            double a = M(0);
+            double b = M(1);
+            double c = M(2);
+            if (a != b && a != c && b != c) {
+                if (a < b && a < c)
+                    M(0) = 1;
+                else if (b < a && b < c)
+                    M(1) = 1;
+                else if (c < a && c < b)
+                    M(2) = 1;
+            }
+            else if (a == b && a != c && b != c) {
+                if (a < c && b < c)
+                    M(1) = 1;
+                else if (c < a && c < b)
+                    M(2) = 1;
+            }
+            else if (a != b && a == c && b != c) {
+                if (a < b && c < b)
+                    M(2) = 1;
+                else if (b < a && b < c)
+                    M(1) = 1;
+            }
+            else if (a != b && a != c && b == c) {
+                if (a < b && a < c)
+                    M(0) = 1;
+                else if (b < a && c < a)
+                    M(2) = 1;
+            }
             else
                 M(2) = 1;
             
