@@ -180,7 +180,7 @@ void Object::output(const std::string& fileName) {
     
     int value;
     for (size_t i = 0; i < mFaces.size(); i++) {
-        outFile << "f " << std::resetiosflags(std::ios::showbase);
+        outFile << "f ";// << std::resetiosflags(std::ios::showbase);
         
         if (mFaces[i][2] == 0 && mFaces[i][5] == 0 && mFaces[i][8] == 0) {
             outFile << mFaces[i][0] << ' '

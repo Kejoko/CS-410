@@ -172,8 +172,8 @@ void DriverHandler::save_object(const std::string& line) {
     }
     
     std::ofstream outTransformationFile(transformationFileName);
-    Object obj = mObjects[0];
-    mObjects.erase(mObjects.begin());
+    Object obj = mObjects.back();
+    mObjects.erase(mObjects.end());
     
     outTransformationFile << "# Transformation matrix\n" << mTransformationMatrix << "\n\n";
     outTransformationFile << "# Sum absolute translations from original to transformed\n" << std::to_string(obj.sum_absolute_translations()) << "\n\n";
