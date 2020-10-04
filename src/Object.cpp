@@ -2,6 +2,8 @@
 // 831455801
 // kkochis@rams.colostate.edu
 
+#include "Object.h"
+
 #include <math.h>
 
 #include <iostream>
@@ -10,8 +12,6 @@
 #include <string>
 
 #include <Eigen/Dense>
-
-#include "Object.h"
 
 Object::Object(const std::string& fileName, const Eigen::Matrix4d& transformationMatrix) {
     std::istringstream fileNameStream(fileName);

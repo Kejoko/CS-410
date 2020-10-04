@@ -7,5 +7,9 @@ add_library(
   DriverHandler.cpp)
 
 add_library(
+  Scene
+  Scene.cpp)
+
+add_library(
   Object
   Object.cpp)
