@@ -57,9 +57,14 @@ public:
     std::vector<PointLight> mPointLights;
     std::vector<Object> mObjects;
     
-    void create_image();
+    void create_resolution();
+    void create_camera();
+    void update_bounds();
+    void create_ambient_light();
+    void create_point_light();
+    void create_object();
     
-private:
+    void output_image();
 };
 
 #endif //SCENE_H
