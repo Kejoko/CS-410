@@ -13,6 +13,10 @@
 
 #include <Eigen/Dense>
 
+Object::Object() {
+    
+}
+
 Object::Object(const std::string& fileName, const Eigen::Matrix4d& transformationMatrix) {
     std::istringstream fileNameStream(fileName);
     fileNameStream >> mFileName;

@@ -5,13 +5,12 @@
 #ifndef DRIVER_HANDLER_H
 #define DRIVER_HANDLER_H
 
-#include "Object.h"
-
 #include <string>
 #include <vector>
 
 #include <Eigen/Dense>
 
+#include "Object.h"
 #include "Scene.h"
 
 /*

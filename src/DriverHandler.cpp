@@ -2,6 +2,8 @@
 // 831455801
 // kkochis@rams.colostate.edu
 
+#include "DriverHandler.h"
+
 #include <math.h>
 
 #include <fstream>
@@ -11,8 +13,6 @@
 #include <vector>
 
 #include <Eigen/Dense>
-
-#include "DriverHandler.h"
 
 #include "Scene.h"
 
@@ -51,7 +51,7 @@ void DriverHandler::read_driver() {
             mScene.create_point_light(line.substr(word.length() + 1, std::string::npos));
         }
         else if (word == "sphere") {
-            mScene.create_object(line.substr(word.length() + 1, std::string::npos));
+            mScene.create_sphere(line.substr(word.length() + 1, std::string::npos));
         }
     }
     

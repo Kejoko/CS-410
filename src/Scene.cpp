@@ -6,9 +6,13 @@
 
 #include <iostream>
 #include <fstream>
+#include <memory>
 #include <sstream>
 #include <string>
 #include <vector>
+
+#include "Object.h"
+#include "Sphere.h"
 
 void Scene::create_resolution(const std::string& line) {
     std::istringstream iss(line);
@@ -81,6 +85,14 @@ void Scene::create_point_light(const std::string& line) {
     newLight.mColorLevels(2) = b;
     
     mPointLights.push_back(newLight);
+}
+
+
+
+
+void Scene::create_sphere(const std::string& line) {
+    std::shared_ptr<Object> newSphere = std::make_shared<Sphere>(line);
+    mpObjects.push_back(newSphere);
 }
 
 

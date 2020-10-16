@@ -14,6 +14,7 @@
 
 class Object {
 public:
+    Object();
     Object(const std::string& fileName, const Eigen::Matrix4d& transformationMatrix);
     
     std::string mFileName;
