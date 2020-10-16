@@ -33,6 +33,7 @@ public:
     std::vector<Object> mObjects;
     
     void read_driver();
+    void output_result();
     void update_matrix(const std::string& line);
     void load_object(const std::string& line);
     void save_object(const std::string& line);

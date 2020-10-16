@@ -28,9 +28,9 @@ void Scene::create_camera(const std::string& line) {
     int ex, ey, ez, lx, ly, lz, ux, uy, uz;
     iss >> ex >> ey >> ez >> lx >> ly >> lz >> ux >> uy >> uz >> mCamera.mNearClippingPlane;
     
-    mCamera.mEyePos(0) = ex;
-    mCamera.mEyePos(1) = ey;
-    mCamera.mEyePos(2) = ez;
+    mCamera.mEyePosition(0) = ex;
+    mCamera.mEyePosition(1) = ey;
+    mCamera.mEyePosition(2) = ez;
     
     mCamera.mLookAt(0) = lx;
     mCamera.mLookAt(1) = ly;
@@ -108,6 +108,68 @@ void Scene::create_object(const std::string& line) {
 
 
 
-void Scene::output_image() {
+Eigen::Vector3d convert_to_255(const Eigen::Vector3d& rgb) {
+    Eigen::Vector3d rgbUpdated;
     
+    rgbUpdated(0) = 255;
+    rgbUpdated(1) = 255;
+    rgbUpdated(2) = 255;
+    
+    return rgbUpdated;
+}
+
+
+
+
+PixelRay Scene::determine_pixelray(int pixw, int pixh) {
+    PixelRay ray;
+    
+    ray.mPosition(0) = mCamera.mEyePosition(0) + mCamera.mLeftBound +
+                       pixw * (mCamera.mRightBound - mCamera.mRightBound) / (mImageWidth - 1);
+    ray.mPosition(1) = mCamera.mEyePosition(1) + mCamera.mBottomBound +
+                       pixh * (mCamera.mTopBound - mCamera.mBottomBound) / (mImageHeight - 1);
+    ray.mPosition(2) = mCamera.mEyePosition(2) + mCamera.mNearClippingPlane;
+    
+    ray.mDirection = ray.mPosition - mCamera.mEyePosition / (ray.mPosition - mCamera.mEyePosition).norm();
+    
+    return ray;
+}
+
+
+
+
+
+Eigen::Vector3d Scene::determine_pixel_colors(int pixw, int pixh) {
+    PixelRay ray = determine_pixelray(pixw, pixh);
+    
+    
+    
+    
+    Eigen::Vector3d rgb;
+    
+    rgb(0) = 0;
+    rgb(1) = 0;
+    rgb(2) = 0;
+    
+    return convert_to_255(rgb);
+}
+
+void Scene::output_image(const std::string& imageName) {
+    std::ofstream output(imageName);
+    
+    output << "P3\n";
+    output << mImageWidth << ' ' << mImageHeight << ' ' << "256\n";
+    for (int i = 0; i < mImageWidth; i++) {
+        for (int j = 0; j < mImageHeight; j++) {
+            Eigen::Vector3d pixelColors = determine_pixel_colors(i, j);
+            
+            output << pixelColors(0) << ' ' << pixelColors(1) << ' ' << pixelColors(2);
+            
+            if (j < mImageHeight - 1)
+                output << ' ';
+        }
+        output << '\n';
+    }
+    
+    output.close();
 }

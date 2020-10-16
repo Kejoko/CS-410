@@ -15,7 +15,7 @@
 #include "Sphere.h"
 
 struct Camera_t {
-    Eigen::Vector3d mEyePos;
+    Eigen::Vector3d mEyePosition;
     Eigen::Vector3d mLookAt;
     Eigen::Vector3d mUpVector;
     
@@ -45,12 +45,19 @@ typedef struct PointLight_t PointLight;
 
 
 
+struct PixelRay_t {
+    Eigen::Vector3d mPosition;
+    Eigen::Vector3d mDirection;
+};
+typedef struct PixelRay_t PixelRay;
+
+
+
 class Scene {
 public:
     Scene() = default;
     Scene(const std::string& outImageName);
     
-    std::string mOutImageName;
     int mImageWidth;
     int mImageHeight;
     
@@ -67,7 +74,9 @@ public:
     void create_sphere(const std::string& line);
     void create_object(const std::string& line);
     
-    void output_image();
+    PixelRay determine_pixelray(int pixw, int pixh);
+    Eigen::Vector3d determine_pixel_colors(int pixw, int pixh);
+    void output_image(const std::string& imageName);
 };
 
 #endif //SCENE_H
