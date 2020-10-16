@@ -14,6 +14,8 @@
 
 #include "DriverHandler.h"
 
+#include "Scene.h"
+
 DriverHandler::DriverHandler(const std::string& inFileName, const std::string& outFileName) {
     mInFileName = inFileName;
     mOutFileName = outFileName;
@@ -34,28 +36,57 @@ void DriverHandler::read_driver() {
         lineReader >> word;
         
         if (word == "camera") {
-            
+            mScene.create_camera(line.substr(word.length() + 1, std::string::npos));
         }
         else if (word == "bounds") {
-            
+            mScene.update_bounds(line.substr(word.length() + 1, std::string::npos));
         }
         else if (word == "res") {
-            
+            mScene.create_resolution(line.substr(word.length() + 1, std::string::npos));
         }
         else if (word == "ambient") {
-            
+            mScene.create_ambient_light(line.substr(word.length() + 1, std::string::npos));
         }
         else if (word == "light") {
-            
+            mScene.create_point_light(line.substr(word.length() + 1, std::string::npos));
         }
         else if (word == "sphere") {
-            
+            mScene.create_object(line.substr(word.length() + 1, std::string::npos));
         }
     }
     
     driverStream.close();
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//======================================================================
+//======================================================================
+//======================================================================
+//======================================================================
+//======================================================================
+// EVERYTHING BELOW THIS POINT IS DEPRECATED AND UNUSED FROM P1
+//======================================================================
+//======================================================================
+//======================================================================
+//======================================================================
+//======================================================================
 
 
 

@@ -3,13 +3,16 @@
 #======================================================================
 
 add_library(
-  DriverHandler
-  DriverHandler.cpp)
+  Object
+  Object.cpp)
 
 add_library(
   Scene
   Scene.cpp)
 
 add_library(
-  Object
-  Object.cpp)
+  DriverHandler
+  DriverHandler.cpp)
+target_link_libraries(
+  DriverHandler
+  Scene)

@@ -13,9 +13,9 @@
 #include "Object.h"
 
 struct Camera_t {
-    Eigen::Vector4d mEyePos;
-    Eigen::Vector4d mLookAt;
-    Eigen::Vector4d mUpVector;
+    Eigen::Vector3d mEyePos;
+    Eigen::Vector3d mLookAt;
+    Eigen::Vector3d mUpVector;
     
     int mNearClippingPlane;
     
@@ -29,15 +29,15 @@ typedef struct Camera_t Camera;
 
 
 struct AmbientLight_t {
-    Eigen::Vector4d mColorLevels;
+    Eigen::Vector3d mColorLevels;
 };
 typedef struct AmbientLight_t AmbientLight;
 
 
 
 struct PointLight_t {
-    Eigen::Vector4d mPosition;
-    Eigen::Vector4d mColorLevels;
+    Eigen::Vector3d mPosition;
+    Eigen::Vector3d mColorLevels;
 };
 typedef struct PointLight_t PointLight;
 
@@ -57,12 +57,12 @@ public:
     std::vector<PointLight> mPointLights;
     std::vector<Object> mObjects;
     
-    void create_resolution();
-    void create_camera();
-    void update_bounds();
-    void create_ambient_light();
-    void create_point_light();
-    void create_object();
+    void create_resolution(const std::string& line);
+    void create_camera(const std::string& line);
+    void update_bounds(const std::string& line);
+    void create_ambient_light(const std::string& line);
+    void create_point_light(const std::string& line);
+    void create_object(const std::string& line);
     
     void output_image();
 };
