@@ -11,6 +11,7 @@
 #include <Eigen/Dense>
 
 #include "Object.h"
+#include "Scene.h"
 
 /*
  This class is responsible for reading lines from the driver file and handling
@@ -21,9 +22,13 @@
 */
 class DriverHandler {
 public:
-    DriverHandler(const std::string& fileName);
+    DriverHandler(const std::string& inFileName, const std::string& outFileName);
     
-    std::string mFileName;
+    std::string mInFileName;
+    std::string mOutFileName;
+    
+    Scene mScene;
+    
     Eigen::Matrix4d mTransformationMatrix;
     std::vector<Object> mObjects;
     

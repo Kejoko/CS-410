@@ -2,6 +2,8 @@
 // 831455801
 // kkochis@rams.colostate.edu
 
+#include "DriverHandler.h"
+
 #include <math.h>
 
 #include <fstream>
@@ -12,14 +14,12 @@
 
 #include <Eigen/Dense>
 
-#include "DriverHandler.h"
+#include "Scene.h"
 
-DriverHandler::DriverHandler(const std::string& fileName) {
-    mFileName = fileName;
-    mTransformationMatrix <<    1, 0, 0, 0,
-                                0, 1, 0, 0,
-                                0, 0, 1, 0,
-                                0, 0, 0, 1;
+DriverHandler::DriverHandler(const std::string& inFileName, const std::string& outFileName) {
+    mInFileName = inFileName;
+    mOutFileName = outFileName;
+    mScene.mOutImageName = outFileName;
 }
 
 
@@ -27,21 +27,66 @@ DriverHandler::DriverHandler(const std::string& fileName) {
 
 
 void DriverHandler::read_driver() {
-    std::ifstream driverStream(mFileName);
+    std::ifstream driverStream(mInFileName);
     std::string line;
+    std::string word;
     
     while(getline(driverStream, line)) {
-        if (line.substr(0,5) == "trans")
-            update_matrix(line.substr(6, std::string::npos));
-        else if (line.substr(0,4) == "load")
-            load_object(line.substr(5, std::string::npos));
-        else if (line.substr(0,4) == "save")
-            save_object(line.substr(5, std::string::npos));
+        std::istringstream lineReader(line);
+        lineReader >> word;
+        
+        if (word == "camera") {
+            mScene.create_camera(line.substr(word.length() + 1, std::string::npos));
+        }
+        else if (word == "bounds") {
+            mScene.update_bounds(line.substr(word.length() + 1, std::string::npos));
+        }
+        else if (word == "res") {
+            mScene.create_resolution(line.substr(word.length() + 1, std::string::npos));
+        }
+        else if (word == "ambient") {
+            mScene.create_ambient_light(line.substr(word.length() + 1, std::string::npos));
+        }
+        else if (word == "light") {
+            mScene.create_point_light(line.substr(word.length() + 1, std::string::npos));
+        }
+        else if (word == "sphere") {
+            mScene.create_sphere(line.substr(word.length() + 1, std::string::npos));
+        }
     }
     
     driverStream.close();
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//======================================================================
+//======================================================================
+//======================================================================
+//======================================================================
+//======================================================================
+// EVERYTHING BELOW THIS POINT IS DEPRECATED AND UNUSED FROM P1
+//======================================================================
+//======================================================================
+//======================================================================
+//======================================================================
+//======================================================================
 
 
 
