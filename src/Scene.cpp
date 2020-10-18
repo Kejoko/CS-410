@@ -4,6 +4,10 @@
 
 #include "Scene.h"
 
+#include <math.h>
+
+#include <climits>
+
 #include <iostream>
 #include <fstream>
 #include <memory>
@@ -111,9 +115,9 @@ void Scene::create_object(const std::string& line) {
 Eigen::Vector3d convert_to_255(const Eigen::Vector3d& rgb) {
     Eigen::Vector3d rgbUpdated;
     
-    rgbUpdated(0) = 255;
-    rgbUpdated(1) = 255;
-    rgbUpdated(2) = 255;
+    rgbUpdated(0) = int(rgb(0) * 255 + 0.5);
+    rgbUpdated(1) = int(rgb(1) * 255 + 0.5);
+    rgbUpdated(2) = int(rgb(2) * 255 + 0.5);
     
     return rgbUpdated;
 }
@@ -139,17 +143,53 @@ PixelRay Scene::determine_pixelray(int pixw, int pixh) {
 
 
 
+int Scene::shoot_spheres(const PixelRay& ray, int& t) {
+    int bestSphereIndex = -1;
+    int minDistance = INT_MAX;
+    int closestSphereIndex, v, d;
+    std::shared_ptr<Sphere> currentSphere;
+    Eigen::Vector3d rayToCenter;
+    
+    for (int i = 0; i < mpObjects.size(); i++) {
+        currentSphere = std::static_pointer_cast<Sphere>(mpObjects[i]);
+        rayToCenter = currentSphere->mPosition - ray.mPosition;
+        v = rayToCenter.dot(ray.mDirection);
+        
+        d = currentSphere->mRadius * currentSphere->mRadius - (rayToCenter.dot(rayToCenter) - v * v);
+        
+        if (d > 0 && d < minDistance) {
+            bestSphereIndex = i;
+            minDistance = d;
+            t = v - sqrt(d);
+        }
+    }
+    
+    return bestSphereIndex;
+}
+
+
+
+
+
 Eigen::Vector3d Scene::determine_pixel_colors(int pixw, int pixh) {
     PixelRay ray = determine_pixelray(pixw, pixh);
     
-    
+    int t;
+    int bestSphereIndex = shoot_spheres(ray, t);
     
     
     Eigen::Vector3d rgb;
-    
     rgb(0) = 0;
     rgb(1) = 0;
     rgb(2) = 0;
+    if (bestSphereIndex >= 0) {
+        
+    }
+    else {
+        rgb(0) = 0;
+        rgb(1) = 0;
+        rgb(2) = 0;
+    }
     
     return convert_to_255(rgb);
 }

@@ -75,6 +75,7 @@ public:
     void create_object(const std::string& line);
     
     PixelRay determine_pixelray(int pixw, int pixh);
+    int shoot_spheres(const PixelRay& ray, int& t);
     Eigen::Vector3d determine_pixel_colors(int pixw, int pixh);
     void output_image(const std::string& imageName);
 };

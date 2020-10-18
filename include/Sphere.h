@@ -13,6 +13,7 @@
 
 class Sphere: public Object {
 public:
+    Sphere() = default;
     Sphere(const std::string& line);
     
     int mRadius;
