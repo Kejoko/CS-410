@@ -18,20 +18,23 @@ struct Camera_t {
     Eigen::Vector3d mEyePosition;
     Eigen::Vector3d mLookAt;
     Eigen::Vector3d mUpVector;
+    Eigen::Vector3d mUDirection;
+    Eigen::Vector3d mVDirection;
+    Eigen::Vector3d mWDirection;
     
-    int mNearClippingPlane;
+    double mNearClippingPlane;
     
-    int mLeftBound;
-    int mRightBound;
-    int mBottomBound;
-    int mTopBound;
+    double mLeftBound;
+    double mRightBound;
+    double mBottomBound;
+    double mTopBound;
 };
 typedef struct Camera_t Camera;
 
 
 
 struct AmbientLight_t {
-    Eigen::Vector3d mColorLevels;
+    Eigen::Vector3d mColor;
 };
 typedef struct AmbientLight_t AmbientLight;
 
@@ -39,7 +42,7 @@ typedef struct AmbientLight_t AmbientLight;
 
 struct PointLight_t {
     Eigen::Vector3d mPosition;
-    Eigen::Vector3d mColorLevels;
+    Eigen::Vector3d mColor;
 };
 typedef struct PointLight_t PointLight;
 
@@ -58,8 +61,8 @@ public:
     Scene() = default;
     Scene(const std::string& outImageName);
     
-    int mImageWidth;
-    int mImageHeight;
+    double mImageWidth;
+    double mImageHeight;
     
     Camera mCamera;
     AmbientLight mAmbientLight;
@@ -75,7 +78,8 @@ public:
     void create_object(const std::string& line);
     
     PixelRay determine_pixelray(int pixw, int pixh);
-    int shoot_spheres(const PixelRay& ray, int& t);
+    void shoot_ray(const PixelRay& ray, std::shared_ptr<Sphere>& bestSphere, Eigen::Vector3d& surfacePoint);
+    Eigen::Vector3d color_sphere_point(const std::shared_ptr<Sphere>& sphere, const Eigen::Vector3d& surfacePoint);
     Eigen::Vector3d determine_pixel_colors(int pixw, int pixh);
     void output_image(const std::string& imageName);
 };
