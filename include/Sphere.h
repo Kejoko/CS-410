@@ -13,9 +13,10 @@
 
 class Sphere: public Object {
 public:
+    Sphere() = default;
     Sphere(const std::string& line);
     
-    int mRadius;
+    double mRadius;
     Eigen::Vector3d mPosition;
     Eigen::Vector3d mAmbientReflection;
     Eigen::Vector3d mDiffuseReflection;

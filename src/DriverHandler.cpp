@@ -19,7 +19,6 @@
 DriverHandler::DriverHandler(const std::string& inFileName, const std::string& outFileName) {
     mInFileName = inFileName;
     mOutFileName = outFileName;
-    mScene.mOutImageName = outFileName;
 }
 
 
@@ -56,6 +55,14 @@ void DriverHandler::read_driver() {
     }
     
     driverStream.close();
+}
+
+
+
+
+
+void DriverHandler::output_result() {
+    mScene.output_image(mOutFileName);
 }
 
 
