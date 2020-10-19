@@ -155,10 +155,6 @@ PixelRay Scene::determine_pixelray(int pixw, int pixh) {
 
 
 void Scene::shoot_ray(const PixelRay& ray, std::shared_ptr<Sphere>& bestSphere, Eigen::Vector3d& surfacePoint) {
-//    std::cout << "-- Ray\n";
-//    std::cout << "position\n" << ray.mPosition << '\n';
-//    std::cout << "direction\n" << ray.mDirection << '\n';
-    
     bestSphere = nullptr;
     
     double minDistance = DBL_MAX;
@@ -179,13 +175,9 @@ void Scene::shoot_ray(const PixelRay& ray, std::shared_ptr<Sphere>& bestSphere, 
         
         d = r2 - (c2 - (v * v));
         
-//        std::cout << "-- R2  " << r2 << '\n';
-//        std::cout << "-- V   " << v << '\n';
-//        std::cout << "-- Csq " << c2 << '\n';
-//        std::cout << "-- D   " << d << '\n';
         if (d > 0.0) {
             d = sqrt(d);
-            if (d <= minDistance) {
+            if (d < minDistance) {
                 bestSphere = currentSphere;
                 minDistance = d;
                 t = v - d;
@@ -229,6 +221,7 @@ Eigen::Vector3d Scene::color_sphere_point(const std::shared_ptr<Sphere>& sphere,
 
 
 Eigen::Vector3d Scene::determine_pixel_colors(int pixw, int pixh) {
+    
     PixelRay ray = determine_pixelray(pixw, pixh);
     
     std::shared_ptr<Sphere> sphere;
@@ -237,12 +230,9 @@ Eigen::Vector3d Scene::determine_pixel_colors(int pixw, int pixh) {
     
     Eigen::Vector3d rgb;
     if (sphere != nullptr) {
-//        std::cout << "-- hit\n";
         rgb = color_sphere_point(sphere, surfacePoint);
-//        std::cout << rgb << '\n';
     }
     else {
-//        std::cout << "-- miss\n";
         rgb(0) = 0;
         rgb(1) = 0;
         rgb(2) = 0;
@@ -262,17 +252,12 @@ void Scene::output_image(const std::string& imageName) {
     output << mImageWidth << ' ' << mImageHeight << ' ' << "255\n";
     for (int i = 0; i < mImageHeight; i++) {
         for (int j = 0; j < mImageWidth; j++) {
-//            std::cout << i << " , " << j << '\n';
-            
             Eigen::Vector3d pixelColors = determine_pixel_colors(j, i);
             
             output << pixelColors(0) << ' ' << pixelColors(1) << ' ' << pixelColors(2);
             
             if (j < mImageHeight - 1)
-                output << ' ';
-            
-//            std::cout << "\n\n";
-        }
+                output << ' ';        }
         output << '\n';
     }
     
