@@ -21,8 +21,6 @@
 void Scene::create_resolution(const std::string& line) {
     std::istringstream iss(line);
     iss >> mImageWidth >> mImageHeight;
-    
-    std::cout << "RESOLUTION: " << mImageWidth << " x " << mImageHeight << "\n\n";
 }
 
 
@@ -50,17 +48,11 @@ void Scene::create_camera(const std::string& line) {
     mCamera.mWDirection = mCamera.mWDirection / mCamera.mWDirection.norm();
     
     mCamera.mUDirection = mCamera.mUpVector.cross(mCamera.mWDirection);
+//    mCamera.mUDirection = mCamera.mWDirection.cross(mCamera.mUpVector);
     mCamera.mUDirection = mCamera.mUDirection / mCamera.mUDirection.norm();
     
     mCamera.mVDirection = mCamera.mWDirection.cross(mCamera.mUDirection);
     mCamera.mVDirection = mCamera.mVDirection / mCamera.mVDirection.norm();
-    
-    
-    std::cout << "CAMERA:\n";
-    std::cout << "Eye Position\n" << mCamera.mEyePosition << '\n';
-    std::cout << "Look At Point\n" << mCamera.mLookAt << '\n';
-    std::cout << "Up Vector\n" << mCamera.mUpVector << '\n';
-    std::cout << "Near Clipping Plane: " << mCamera.mNearClippingPlane << "\n\n";
 }
 
 
@@ -70,12 +62,6 @@ void Scene::create_camera(const std::string& line) {
 void Scene::update_bounds(const std::string& line) {
     std::istringstream iss(line);
     iss >> mCamera.mLeftBound >> mCamera.mRightBound >> mCamera.mBottomBound >> mCamera.mTopBound;
-    
-    std::cout << "BOUNDS\n";
-    std::cout << "Left: " << mCamera.mLeftBound << '\n';
-    std::cout << "Right: " << mCamera.mRightBound << '\n';
-    std::cout << "Bottom: " << mCamera.mBottomBound << '\n';
-    std::cout << "Top: " << mCamera.mTopBound << "\n\n";
 }
 
 
@@ -90,8 +76,6 @@ void Scene::create_ambient_light(const std::string& line) {
     mAmbientLight.mColor(0) = r;
     mAmbientLight.mColor(1) = g;
     mAmbientLight.mColor(2) = b;
-    
-    std::cout << "AMBIENT LIGHT\n" << mAmbientLight.mColor << "\n\n";
 }
 
 
@@ -115,10 +99,6 @@ void Scene::create_point_light(const std::string& line) {
     newLight.mColor(2) = b;
     
     mPointLights.push_back(newLight);
-    
-    std::cout << "POINT LIGHT\n";
-    std::cout << "Position\n" << mPointLights.back().mPosition << '\n';
-    std::cout << "Color\n" << mPointLights.back().mColor << "\n\n";
 }
 
 
@@ -129,10 +109,6 @@ void Scene::create_sphere(const std::string& line) {
     mpObjects.push_back(newSphere);
     
     std::shared_ptr<Sphere> sphere = std::static_pointer_cast<Sphere>(mpObjects.back());
-    std::cout << "SPHERE: " << sphere->mRadius << '\n';
-    std::cout << "Position\n" << sphere->mPosition << '\n';
-    std::cout << "Ambient Reflection\n" << sphere->mAmbientReflection << '\n';
-    std::cout << "Diffuse Reflection\n" << sphere->mDiffuseReflection << "\n\n";
 }
 
 
@@ -172,10 +148,6 @@ PixelRay Scene::determine_pixelray(int pixw, int pixh) {
     ray.mDirection = ray.mPosition - mCamera.mEyePosition;
     ray.mDirection = ray.mDirection / ray.mDirection.norm();
     
-    std::cout << "RAY\n";
-    std::cout << "position\n" << ray.mPosition << '\n';
-    std::cout << "direction\n" << ray.mDirection << '\n';
-    
     return ray;
 }
 
@@ -200,10 +172,8 @@ void Scene::shoot_ray(const PixelRay& ray, std::shared_ptr<Sphere>& bestSphere, 
         
         d = (currentSphere->mRadius * currentSphere->mRadius) - (rayToCenter.dot(rayToCenter) - (v * v));
         
-        std::cout << d << '\n';
         if (d > 0.0) {
             d = sqrt(d);
-            std::cout << d << '\n';
             if (d <= minDistance) {
                 bestSphere = currentSphere;
                 minDistance = d;
@@ -256,12 +226,9 @@ Eigen::Vector3d Scene::determine_pixel_colors(int pixw, int pixh) {
     
     Eigen::Vector3d rgb;
     if (sphere != nullptr) {
-        std::cout << "hit\n";
         rgb = color_sphere_point(sphere, surfacePoint);
-        std::cout << rgb << '\n';
     }
     else {
-        std::cout << "miss\n";
         rgb(0) = 0;
         rgb(1) = 0;
         rgb(2) = 0;
@@ -275,17 +242,15 @@ Eigen::Vector3d Scene::determine_pixel_colors(int pixw, int pixh) {
 
 
 void Scene::output_image(const std::string& imageName) {
-    std::cout << "----- RENDERING -----\n";
-    
     std::ofstream output(imageName);
     
     output << "P3\n";
     output << mImageWidth << ' ' << mImageHeight << ' ' << "255\n";
-    for (int i = 0; i < mImageWidth; i++) {
-        for (int j = 0; j < mImageHeight; j++) {
+    for (int i = 0; i < mImageHeight; i++) {
+        for (int j = 0; j < mImageWidth; j++) {
             std::cout << i << " , " << j << '\n';
             
-            Eigen::Vector3d pixelColors = determine_pixel_colors(i, j);
+            Eigen::Vector3d pixelColors = determine_pixel_colors(j, i);
             
             output << pixelColors(0) << ' ' << pixelColors(1) << ' ' << pixelColors(2);
             
