@@ -48,7 +48,6 @@ void Scene::create_camera(const std::string& line) {
     mCamera.mWDirection = mCamera.mWDirection / mCamera.mWDirection.norm();
     
     mCamera.mUDirection = mCamera.mUpVector.cross(mCamera.mWDirection);
-//    mCamera.mUDirection = mCamera.mWDirection.cross(mCamera.mUpVector);
     mCamera.mUDirection = mCamera.mUDirection / mCamera.mUDirection.norm();
     
     mCamera.mVDirection = mCamera.mWDirection.cross(mCamera.mUDirection);
@@ -156,10 +155,14 @@ PixelRay Scene::determine_pixelray(int pixw, int pixh) {
 
 
 void Scene::shoot_ray(const PixelRay& ray, std::shared_ptr<Sphere>& bestSphere, Eigen::Vector3d& surfacePoint) {
+//    std::cout << "-- Ray\n";
+//    std::cout << "position\n" << ray.mPosition << '\n';
+//    std::cout << "direction\n" << ray.mDirection << '\n';
+    
     bestSphere = nullptr;
     
     double minDistance = DBL_MAX;
-    double v, d, t;
+    double v, r2, c2, d, t;
     std::shared_ptr<Sphere> currentSphere;
     Eigen::Vector3d rayToCenter;
     
@@ -170,8 +173,16 @@ void Scene::shoot_ray(const PixelRay& ray, std::shared_ptr<Sphere>& bestSphere, 
         
         v = rayToCenter.dot(ray.mDirection);
         
-        d = (currentSphere->mRadius * currentSphere->mRadius) - (rayToCenter.dot(rayToCenter) - (v * v));
+        r2 = currentSphere->mRadius * currentSphere->mRadius;
         
+        c2 = rayToCenter.dot(rayToCenter);
+        
+        d = r2 - (c2 - (v * v));
+        
+//        std::cout << "-- R2  " << r2 << '\n';
+//        std::cout << "-- V   " << v << '\n';
+//        std::cout << "-- Csq " << c2 << '\n';
+//        std::cout << "-- D   " << d << '\n';
         if (d > 0.0) {
             d = sqrt(d);
             if (d <= minDistance) {
@@ -226,9 +237,12 @@ Eigen::Vector3d Scene::determine_pixel_colors(int pixw, int pixh) {
     
     Eigen::Vector3d rgb;
     if (sphere != nullptr) {
+//        std::cout << "-- hit\n";
         rgb = color_sphere_point(sphere, surfacePoint);
+//        std::cout << rgb << '\n';
     }
     else {
+//        std::cout << "-- miss\n";
         rgb(0) = 0;
         rgb(1) = 0;
         rgb(2) = 0;
@@ -248,7 +262,7 @@ void Scene::output_image(const std::string& imageName) {
     output << mImageWidth << ' ' << mImageHeight << ' ' << "255\n";
     for (int i = 0; i < mImageHeight; i++) {
         for (int j = 0; j < mImageWidth; j++) {
-            std::cout << i << " , " << j << '\n';
+//            std::cout << i << " , " << j << '\n';
             
             Eigen::Vector3d pixelColors = determine_pixel_colors(j, i);
             
@@ -257,7 +271,7 @@ void Scene::output_image(const std::string& imageName) {
             if (j < mImageHeight - 1)
                 output << ' ';
             
-            std::cout << "\n\n";
+//            std::cout << "\n\n";
         }
         output << '\n';
     }
