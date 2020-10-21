@@ -130,6 +130,13 @@ Eigen::Vector3d convert_to_255(const Eigen::Vector3d& rgb) {
     rgbUpdated(1) = int(rgb(1) * 255 + 0.5);
     rgbUpdated(2) = int(rgb(2) * 255 + 0.5);
     
+    for (int i = 0; i < 3; i++) {
+        rgbUpdated(i) = int(rgb(i) * 255 + 0.5);
+        
+        if (rgbUpdated(i) > 255) rgbUpdated(i) = 255;
+        if (rgbUpdated(i) < 0) rgbUpdated(i) = 0;
+    }
+    
     return rgbUpdated;
 }
 
