@@ -13,6 +13,9 @@
 
 class Sphere: public Object {
 public:
+    static int msCount;
+    int mId;
+    
     Sphere() = default;
     Sphere(const std::string& line);
     
