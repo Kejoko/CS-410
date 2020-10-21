@@ -8,7 +8,11 @@
 #include <sstream>
 #include <string>
 
+int Sphere::msCount = 0;
+
 Sphere::Sphere(const std::string& line) : Object() {
+    mId = msCount++;
+    
     std::istringstream iss(line);
     iss >> mPosition(0) >> mPosition(1) >> mPosition(2);
     iss >> mRadius;

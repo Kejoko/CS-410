@@ -31,26 +31,28 @@ void DriverHandler::read_driver() {
     std::string word;
     
     while(getline(driverStream, line)) {
-        std::istringstream lineReader(line);
-        lineReader >> word;
-        
-        if (word == "camera") {
-            mScene.create_camera(line.substr(word.length() + 1, std::string::npos));
-        }
-        else if (word == "bounds") {
-            mScene.update_bounds(line.substr(word.length() + 1, std::string::npos));
-        }
-        else if (word == "res") {
-            mScene.create_resolution(line.substr(word.length() + 1, std::string::npos));
-        }
-        else if (word == "ambient") {
-            mScene.create_ambient_light(line.substr(word.length() + 1, std::string::npos));
-        }
-        else if (word == "light") {
-            mScene.create_point_light(line.substr(word.length() + 1, std::string::npos));
-        }
-        else if (word == "sphere") {
-            mScene.create_sphere(line.substr(word.length() + 1, std::string::npos));
+        if (!line.empty()) {
+            std::istringstream lineReader(line);
+            lineReader >> word;
+            
+            if (word == "camera") {
+                mScene.create_camera(line.substr(word.length() + 1, std::string::npos));
+            }
+            else if (word == "bounds") {
+                mScene.update_bounds(line.substr(word.length() + 1, std::string::npos));
+            }
+            else if (word == "res") {
+                mScene.create_resolution(line.substr(word.length() + 1, std::string::npos));
+            }
+            else if (word == "ambient") {
+                mScene.create_ambient_light(line.substr(word.length() + 1, std::string::npos));
+            }
+            else if (word == "light") {
+                mScene.create_point_light(line.substr(word.length() + 1, std::string::npos));
+            }
+            else if (word == "sphere") {
+                mScene.create_sphere(line.substr(word.length() + 1, std::string::npos));
+            }
         }
     }
     
