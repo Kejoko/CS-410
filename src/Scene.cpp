@@ -172,7 +172,7 @@ void Scene::shoot_ray(const PixelRay& ray, std::shared_ptr<Sphere>& bestSphere, 
     for (int i = 0; i < mpObjects.size(); i++) {
         currentSphere = std::static_pointer_cast<Sphere>(mpObjects[i]);
         
-        rayToCenter = currentSphere->mPosition - ray.mPosition;
+        rayToCenter = currentSphere->mPosition - ray.mPosition; //Tv
         
         v = rayToCenter.dot(ray.mDirection);
         
@@ -182,16 +182,11 @@ void Scene::shoot_ray(const PixelRay& ray, std::shared_ptr<Sphere>& bestSphere, 
         
         d = r2 - (c2 - (v * v));
         
-        if ((pixw >= 5 && pixw <= 8) && (pixh >= 5 && pixh <= 8) && (currentSphere->mId == 1 || currentSphere->mId == 2)) {
-            std::cout << "considering: " << currentSphere->mId << "\td: " << d << '\n';
-        }
-        
         if (d > 0.0) {
-            d = sqrt(d);
-            if (d < minDistance) {
+            t = v - sqrt(d);
+            if (t < minDistance) {
                 bestSphere = currentSphere;
-                minDistance = d;
-                t = v - d;
+                minDistance = t;
                 surfacePoint = ray.mPosition + t * ray.mDirection;
             }
         }
@@ -232,10 +227,6 @@ Eigen::Vector3d Scene::color_sphere_point(const std::shared_ptr<Sphere>& sphere,
 
 
 Eigen::Vector3d Scene::determine_pixel_colors(int pixw, int pixh) {
-    if ((pixw >= 5 && pixw <= 8) && (pixh >= 5 && pixh <= 8)) {
-        std::cout << pixh << " , " << pixw << '\n';
-    }
-    
     PixelRay ray = determine_pixelray(pixw, pixh);
     
     std::shared_ptr<Sphere> sphere;
@@ -245,11 +236,6 @@ Eigen::Vector3d Scene::determine_pixel_colors(int pixw, int pixh) {
     Eigen::Vector3d rgb;
     if (sphere != nullptr) {
         rgb = color_sphere_point(sphere, surfacePoint);
-        
-        if ((pixw >= 5 && pixw <= 8) && (pixh >= 5 && pixh <= 8)) {
-            std::cout << "Sphere: " << sphere->mId << '\n' << convert_to_255(rgb) << "\n\n";
-        }
-        
     }
     else {
         rgb(0) = 0;
