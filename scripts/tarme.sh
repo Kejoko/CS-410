@@ -8,6 +8,6 @@ tar -cvf ~/Desktop/KeeganKochisXX.tar \
     dependencies \
     include \
     src \
-    render.cpp \
+    raytracer.cpp \
     CMakeLists.txt \
     README.txt
