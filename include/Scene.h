@@ -78,7 +78,7 @@ public:
     void create_object(const std::string& line);
     
     PixelRay determine_pixelray(int pixw, int pixh);
-    void shoot_ray(const PixelRay& ray, std::shared_ptr<Sphere>& bestSphere, Eigen::Vector3d& surfacePoint);
+    void shoot_ray(const PixelRay& ray, std::shared_ptr<Sphere>& bestSphere, Eigen::Vector3d& surfacePoint, int pixw, int pixh);
     Eigen::Vector3d color_sphere_point(const std::shared_ptr<Sphere>& sphere, const Eigen::Vector3d& surfacePoint);
     Eigen::Vector3d determine_pixel_colors(int pixw, int pixh);
     void output_image(const std::string& imageName);

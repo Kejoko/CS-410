@@ -161,7 +161,7 @@ PixelRay Scene::determine_pixelray(int pixw, int pixh) {
 
 
 
-void Scene::shoot_ray(const PixelRay& ray, std::shared_ptr<Sphere>& bestSphere, Eigen::Vector3d& surfacePoint) {
+void Scene::shoot_ray(const PixelRay& ray, std::shared_ptr<Sphere>& bestSphere, Eigen::Vector3d& surfacePoint, int pixw, int pixh) {
     bestSphere = nullptr;
     
     double minDistance = DBL_MAX;
@@ -181,6 +181,10 @@ void Scene::shoot_ray(const PixelRay& ray, std::shared_ptr<Sphere>& bestSphere, 
         c2 = rayToCenter.dot(rayToCenter);
         
         d = r2 - (c2 - (v * v));
+        
+        if ((pixw >= 5 && pixw <= 8) && (pixh >= 5 && pixh <= 8) && (currentSphere->mId == 1 || currentSphere->mId == 2)) {
+            std::cout << "considering: " << currentSphere->mId << "\td: " << d << '\n';
+        }
         
         if (d > 0.0) {
             d = sqrt(d);
@@ -228,16 +232,24 @@ Eigen::Vector3d Scene::color_sphere_point(const std::shared_ptr<Sphere>& sphere,
 
 
 Eigen::Vector3d Scene::determine_pixel_colors(int pixw, int pixh) {
+    if ((pixw >= 5 && pixw <= 8) && (pixh >= 5 && pixh <= 8)) {
+        std::cout << pixh << " , " << pixw << '\n';
+    }
     
     PixelRay ray = determine_pixelray(pixw, pixh);
     
     std::shared_ptr<Sphere> sphere;
     Eigen::Vector3d surfacePoint;
-    shoot_ray(ray, sphere, surfacePoint);
+    shoot_ray(ray, sphere, surfacePoint, pixw, pixh);
     
     Eigen::Vector3d rgb;
     if (sphere != nullptr) {
         rgb = color_sphere_point(sphere, surfacePoint);
+        
+        if ((pixw >= 5 && pixw <= 8) && (pixh >= 5 && pixh <= 8)) {
+            std::cout << "Sphere: " << sphere->mId << '\n' << convert_to_255(rgb) << "\n\n";
+        }
+        
     }
     else {
         rgb(0) = 0;

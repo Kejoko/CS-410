@@ -36,9 +36,9 @@ add_subdirectory(src)
 #======================================================================
 list(APPEND LIBS DriverHandler Object)
 
-add_executable(render render.cpp)
+add_executable(raytracer raytracer.cpp)
 
 target_link_libraries(
-  render
+  raytracer
   PRIVATE
   ${LIBS})
