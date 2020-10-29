@@ -64,11 +64,14 @@ public:
     double mImageWidth;
     double mImageHeight;
     
+    int mRecursionLevel;
+    
     Camera mCamera;
     AmbientLight mAmbientLight;
     std::vector<PointLight> mPointLights;
     std::vector<std::shared_ptr<Object>> mpObjects;
     
+    void update_recursion_level(const std::string& line);
     void create_resolution(const std::string& line);
     void create_camera(const std::string& line);
     void update_bounds(const std::string& line);
