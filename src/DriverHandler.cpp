@@ -35,7 +35,10 @@ void DriverHandler::read_driver() {
             std::istringstream lineReader(line);
             lineReader >> word;
             
-            if (word == "camera") {
+            if (word == "recursionlevel"){
+                mScene.update_recursion_level(line.substr(word.length() + 1, std::string::npos));
+            }
+            else if (word == "camera") {
                 mScene.create_camera(line.substr(word.length() + 1, std::string::npos));
             }
             else if (word == "bounds") {
@@ -49,6 +52,12 @@ void DriverHandler::read_driver() {
             }
             else if (word == "light") {
                 mScene.create_point_light(line.substr(word.length() + 1, std::string::npos));
+            }
+            else if (word == "trans") {
+                update_matrix(line.substr(word.length() + 1, std::string::npos));
+            }
+            else if (word == "load") {
+                // Load .obj file and save it as object in mScene
             }
             else if (word == "sphere") {
                 mScene.create_sphere(line.substr(word.length() + 1, std::string::npos));
@@ -67,35 +76,6 @@ void DriverHandler::output_result() {
     mScene.output_image(mOutFileName);
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//======================================================================
-//======================================================================
-//======================================================================
-//======================================================================
-//======================================================================
-// EVERYTHING BELOW THIS POINT IS DEPRECATED AND UNUSED FROM P1
-//======================================================================
-//======================================================================
-//======================================================================
-//======================================================================
-//======================================================================
 
 
 

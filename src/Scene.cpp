@@ -27,6 +27,16 @@ void Scene::create_resolution(const std::string& line) {
 
 
 
+void Scene::update_recursion_level(const std::string& line) {
+    std::istringstream iss(line);
+    iss >> mRecursionLevel;
+    std::cout << "RECURSE: " << mRecursionLevel << '\n';
+}
+
+
+
+
+
 void Scene::create_camera(const std::string& line) {
     std::istringstream iss(line);
     double ex, ey, ez, lx, ly, lz, ux, uy, uz;
