@@ -8,37 +8,50 @@
 
 #include <iostream>
 #include <fstream>
+#include <memory>
 #include <sstream>
 #include <string>
 
 #include <Eigen/Dense>
+
+#include "Material.h"
 
 Object::Object() {
     
 }
 
 Object::Object(const std::string& fileName, const Eigen::Matrix4d& transformationMatrix) {
+    std::cout << "--- Object: " << fileName << " ---\n";
+    
     std::istringstream fileNameStream(fileName);
     fileNameStream >> mFileName;
     
     std::ifstream objReader(mFileName);
     std::string line, word;
-    std::istringstream infoStream;
     
     while(getline(objReader, line)) {
-        if (line.substr(0,1) == "v" && line.substr(0,2) != "vn" && line.substr(0,2) != "vp" && line.substr(0,2) != "vt") {
+        std::istringstream iss(line);
+        iss >> word;
+        
+        if (word == "v") {
             handle_vertex(line.substr(2, std::string::npos), transformationMatrix);
         }
-        else if (line.substr(0,2) == "vn") {
+        else if (word == "vn") {
             handle_vertex_normal(line.substr(3, std::string::npos), transformationMatrix);
         }
-        else if (line.substr(0,1) == "s") {
+        else if (word == "s") {
             handle_smoothing(line.substr(2, std::string::npos));
         }
-        else if (line.substr(0,1) == "f") {
+        else if (word == "mtllib") {
+            create_material_library(line.substr(word.length() + 1, std::string::npos));
+        }
+        else if (word == "usemtl") {
+            update_current_material(line.substr(word.length() + 1, std::string::npos));
+        }
+        else if (word == "f") {
             handle_face(line.substr(2, std::string::npos));
         }
-        else if (line.substr(0,1) == "l") {
+        else if (word == "l") {
             handle_line(line.substr(2, std::string::npos));
         }
     }
@@ -81,6 +94,47 @@ void Object::handle_vertex_normal(const std::string& info, const Eigen::Matrix4d
 
 void Object::handle_smoothing(const std::string& info) {
     mSmoothing = info;
+}
+
+
+
+
+
+void Object::create_material_library(const std::string& fileName) {
+    std::cout << "-- Material library: " << fileName << " --\n";
+    
+    std::ifstream materialLibraryStream(fileName);
+    std::string line;
+    std::string word;
+    
+    while(getline(materialLibraryStream, line)) {
+        if (!line.empty()) {
+            std::istringstream lineReader(line);
+            lineReader >> word;
+            
+            if (word == "newmtl") {
+                std::shared_ptr<Material> newMaterial = std::make_shared<Material>(materialLibraryStream, line.substr(word.length() + 1, std::string::npos));
+                mMaterialLibrary.push_back(newMaterial);
+            }
+        }
+    }
+    
+    materialLibraryStream.close();
+}
+
+
+
+
+
+void Object::update_current_material(const std::string& materialName) {
+    std::cout << "-- Looking for material: " << materialName << " --\n";
+    for (auto material : mMaterialLibrary) {
+        if (material->mName == materialName) {
+            mCurrentMaterial = material;
+            std::cout << "\tFound " << material->mName << '\n';
+            break;
+        }
+    }
 }
 
 

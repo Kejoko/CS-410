@@ -30,7 +30,6 @@ void Scene::create_resolution(const std::string& line) {
 void Scene::update_recursion_level(const std::string& line) {
     std::istringstream iss(line);
     iss >> mRecursionLevel;
-    std::cout << "RECURSE: " << mRecursionLevel << '\n';
 }
 
 

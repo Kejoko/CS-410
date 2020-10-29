@@ -1,10 +1,16 @@
 #======================================================================
 # src
 #======================================================================
+add_library(
+  Material
+  Material.cpp)
 
 add_library(
   Object
   Object.cpp)
+target_link_libraries(
+  Object
+  Material)
 
 add_library(
   Sphere
