@@ -78,7 +78,7 @@ public:
     void create_ambient_light(const std::string& line);
     void create_point_light(const std::string& line);
     void create_sphere(const std::string& line);
-    void create_object(const std::string& line);
+    void create_object(const std::string& line, const Eigen::Matrix4d& transformationMatrix);
     
     PixelRay determine_pixelray(int pixw, int pixh);
     void shoot_ray(const PixelRay& ray, std::shared_ptr<Sphere>& bestSphere, Eigen::Vector3d& surfacePoint, int pixw, int pixh);

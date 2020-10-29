@@ -116,17 +116,15 @@ void Scene::create_point_light(const std::string& line) {
 void Scene::create_sphere(const std::string& line) {
     std::shared_ptr<Object> newSphere = std::make_shared<Sphere>(line);
     mpObjects.push_back(newSphere);
-    
-    std::shared_ptr<Sphere> sphere = std::static_pointer_cast<Sphere>(mpObjects.back());
 }
 
 
 
 
 
-void Scene::create_object(const std::string& line) {
-    std::cout << line << '\n';
-    
+void Scene::create_object(const std::string& line, const Eigen::Matrix4d& transformationMatrix) {
+    std::shared_ptr<Object> newObject = std::make_shared<Object>(line, transformationMatrix);
+    mpObjects.push_back(newObject);
 }
 
 
