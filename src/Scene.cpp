@@ -259,7 +259,7 @@ Eigen::Vector3d Scene::determine_pixel_colors(int pixw, int pixh) {
 
 
 Eigen::Vector3d Scene::raytrace(Ray& ray) {
-    Eigen::Vector3d color;
+    Eigen::Vector3d color(0, 0, 0);
     
     std::shared_ptr<Object> pBestObject = nullptr;
     Face face, bestFace;
@@ -275,7 +275,6 @@ Eigen::Vector3d Scene::raytrace(Ray& ray) {
             pBestObject = pObject;
             bestFace = face;
             bestPoint = ray.mPosition + t * ray.mDirection;
-            std::cout << "Best point\n" << bestPoint << '\n';
             hit = true;
         }
     }
@@ -288,13 +287,6 @@ Eigen::Vector3d Scene::raytrace(Ray& ray) {
         double specularExponent;
         int illumination;
         
-        std::cout << "Determining object or sphere\n";
-        if (pBestObject == nullptr) {
-            std::cout << "Best object is nullptr\n";
-        }
-        else {
-            std::cout << "Best object exists\n";
-        }
         std::shared_ptr<Sphere> pSphere = std::dynamic_pointer_cast<Sphere>(pBestObject);
         if (pSphere) {
             std::cout << "Best: Sphere " << pSphere->mSphereId << '\n';
@@ -309,7 +301,7 @@ Eigen::Vector3d Scene::raytrace(Ray& ray) {
             illumination = 3;
         }
         else {
-            std::cout << "Best: Object "/* << pSphere->mObjectId*/ << '\n';
+            std::cout << "Best: Object " << pBestObject->mObjectId << '\n';
             
             surfaceNormal = bestFace.mNormal;
             
@@ -332,20 +324,16 @@ Eigen::Vector3d Scene::raytrace(Ray& ray) {
             ptol = ptol / ptol.norm();
             
             surfaceProjection = surfaceNormal.dot(ptol);
-            std::cout << surfaceProjection << "\n\n";
             if (surfaceProjection > 0.0) {
-                color(0) += light.mColor(0) * matDiffuse(0) * surfaceNormal;
-                color(1) += light.mColor(1) * matDiffuse(1) * surfaceNormal;
-                color(2) += light.mColor(2) * matDiffuse(2) * surfaceNormal;
+                color(0) += light.mColor(0) * matDiffuse(0) * surfaceProjection;
+                color(1) += light.mColor(1) * matDiffuse(1) * surfaceProjection;
+                color(2) += light.mColor(2) * matDiffuse(2) * surfaceProjection;
             }
         }
-        std::cout << "HIT\n";
-    }
-    else {
-        std::cout << "miss\n";
     }
     
-    return color;
+    std::cout << "Result\n" << convert_to_255(color) << '\n';
+    return convert_to_255(color);
 }
 
 
@@ -369,20 +357,14 @@ void Scene::render(const std::string& imageName) {
             pixelColors = raytrace(ray);
             std::cout << "\n\n\n";
             
-            
-            
-            
-            
-            
-            
-            
-            
 //            pixelColors = determine_pixel_colors(j, i);
             
             output << pixelColors(0) << ' ' << pixelColors(1) << ' ' << pixelColors(2);
             
-            if (j < mImageHeight - 1)
-                output << ' ';        }
+            if (j < mImageHeight - 1) {
+                output << ' ';
+            }
+        }
         output << '\n';
     }
     

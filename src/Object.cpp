@@ -266,13 +266,11 @@ double Object::ray_intersect(Ray& ray, Face& bestFace) {
     Eigen::Matrix3d MM, MMinverse;
     
     for (auto currFace : mFaces) {
-        std::cout << "Checking face\n";
         A = mVertices[currFace.mVertexIndices[0]];
         B = mVertices[currFace.mVertexIndices[1]];
         C = mVertices[currFace.mVertexIndices[2]];
         
         rtoa = A - ray.mPosition;
-        std::cout << "rtoa\n" << rtoa << '\n';
         
         MM <<   (A-B)(0), (A-C)(0), ray.mDirection(0),
                 (A-B)(1), (A-C)(1), ray.mDirection(1),
@@ -285,21 +283,16 @@ double Object::ray_intersect(Ray& ray, Face& bestFace) {
         beta = result(0);
         gamma = result(1);
         t = result(2);
-        std::cout << "b:\t" << beta << '\n';
-        std::cout << "g:\t" << gamma << '\n';
-        std::cout << "t:\t" << t << '\n';
         
         if (beta > 0.0 && gamma > 0.0 && (beta + gamma) < 1.0 && t > 0.0) {
             std::cout << "Face\n";
             if (t < tBest) {
-                std::cout << "New best face\n";
+                std::cout << "New best face:\t" << t << '\n';
                 tBest = t;
                 bestFace = currFace;
             }
         }
     }
-    
-    std::cout << "best\t" << tBest << '\n';
     return tBest;
 }
 
