@@ -200,8 +200,11 @@ void Object::handle_face(const std::string& info) {
     newFace.mNormal = BA.cross(CB);
     newFace.mNormal = newFace.mNormal / newFace.mNormal.norm();
     
+    newFace.mMaterial = mCurrentMaterial;
+    
     mFaces.push_back(newFace);
     
+    std::cout << mFaces.back().mMaterial->mName << '\n';
     std::cout << "A(" << mFaces.back().mVertexIndices[0] + 1 << "):\t";
     for (int i = 0; i < 4; i++) {
         std::cout << mHomogeneousVertices[mFaces.back().mVertexIndices[0]](i) << ' ';
