@@ -17,16 +17,28 @@
 
 class Object {
 public:
+    
+    struct Face_t {
+        std::vector<int> mVertexIndices;
+        
+        Eigen::Vector3d mNormal;
+        
+        std::shared_ptr<Material> mMaterial;
+    }; typedef Face_t Face;
+    
+    
+    
     Object();
     Object(const std::string& fileName, const Eigen::Matrix4d& transformationMatrix);
     
     std::string mFileName;
     std::vector<std::shared_ptr<Material>> mMaterialLibrary;
     std::shared_ptr<Material> mCurrentMaterial;
-    std::vector<Eigen::Vector4d> mOldVertices;
-    std::vector<Eigen::Vector4d> mVertices;
+    std::vector<Eigen::Vector4d> mOldHomogeneousVertices;
+    std::vector<Eigen::Vector4d> mHomogeneousVertices;
+    std::vector<Eigen::Vector3d> mVertices;
     std::vector<Eigen::Vector4d> mVertexNormals;
-    std::vector<std::array<int, 9>> mFaces;
+    std::vector<Face> mFaces;
     std::string mSmoothing;
     std::vector<std::vector<int>> mLines;
     

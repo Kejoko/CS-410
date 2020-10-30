@@ -19,6 +19,8 @@
 DriverHandler::DriverHandler(const std::string& inFileName, const std::string& outFileName) {
     mInFileName = inFileName;
     mOutFileName = outFileName;
+    
+    update_matrix("clear");
 }
 
 

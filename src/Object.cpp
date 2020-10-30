@@ -16,6 +16,8 @@
 
 #include "Material.h"
 
+bool has_printed_mat = false;
+
 Object::Object() {
     
 }
@@ -28,6 +30,8 @@ Object::Object(const std::string& fileName, const Eigen::Matrix4d& transformatio
     
     std::ifstream objReader(mFileName);
     std::string line, word;
+    
+    bool has_printed_v = false;
     
     while(getline(objReader, line)) {
         std::istringstream iss(line);
@@ -46,6 +50,18 @@ Object::Object(const std::string& fileName, const Eigen::Matrix4d& transformatio
             create_material_library(line.substr(word.length() + 1, std::string::npos));
         }
         else if (word == "usemtl") {
+            if (!has_printed_v) {
+                std::cout << "\n\n----- ----- vertices ----- -----\n";
+                for (int i = 0; i < mVertices.size(); i++) {
+                    std::cout << "V " << i+1 << '\t';
+                    for (int j = 0; j < 3; j++) {
+                        std::cout << mVertices[i](j) << ' ';
+                    }
+                    std::cout << '\n';
+                }
+                std::cout << "----- ----- ----- ----- -----\n\n\n";
+                has_printed_v = true;
+            }
             update_current_material(line.substr(word.length() + 1, std::string::npos));
         }
         else if (word == "f") {
@@ -68,10 +84,35 @@ void Object::handle_vertex(const std::string& info, const Eigen::Matrix4d& trans
     double x, y, z;
     
     infoStream >> x >> y >> z;
-    mOldVertices.emplace_back(x, y, z, 1.0);
-    mVertices.emplace_back(x, y, z, 1.0);
+    mOldHomogeneousVertices.emplace_back(x, y, z, 1.0);
+    mHomogeneousVertices.emplace_back(x, y, z, 1.0);
     
-    mVertices.back() = transformationMatrix * mVertices.back();
+    mHomogeneousVertices.back() = transformationMatrix * mHomogeneousVertices.back();
+    
+    Eigen::Vector3d updatedVertex = mHomogeneousVertices.back().head<3>();
+    updatedVertex = updatedVertex / mHomogeneousVertices.back()(3);
+    mVertices.emplace_back(updatedVertex);
+    
+    if (!has_printed_mat) {
+        std::cout << "----- TRANSFORMATION MATRIX -----\n" << transformationMatrix << "\n----- ----- ----- ----- -----\n\n";
+        
+        has_printed_mat = true;
+    }
+    
+    std::cout << "VERTEX " << info << '\n';
+    std::cout << "old ";
+    for (int i = 0; i < 4; i++) {
+        std::cout << mOldHomogeneousVertices.back()(i) << ' ';
+    }
+    std::cout << "\nhom ";
+    for (int i = 0; i < 4; i++) {
+        std::cout << mHomogeneousVertices.back()(i) << ' ';
+    }
+    std::cout << "\nreg ";
+    for (int i = 0; i < 3; i++) {
+        std::cout << mVertices.back()(i) << ' ';
+    }
+    std::cout << "\n\n";
 }
 
 
@@ -101,7 +142,7 @@ void Object::handle_smoothing(const std::string& info) {
 
 
 void Object::create_material_library(const std::string& fileName) {
-    std::cout << "-- Material library: " << fileName << " --\n";
+    std::cout << "\n\n----- Material library: " << fileName << " -----\n";
     
     std::ifstream materialLibraryStream(fileName);
     std::string line;
@@ -120,6 +161,7 @@ void Object::create_material_library(const std::string& fileName) {
     }
     
     materialLibraryStream.close();
+    std::cout << "----- ----- ----- ----- ----- ----- -----\n\n\n";
 }
 
 
@@ -142,37 +184,47 @@ void Object::update_current_material(const std::string& materialName) {
 
 
 void Object::handle_face(const std::string& info) {
-    std::istringstream infoStream(info);
-    std::string index, token;
-    int i = 0, tokenCount = 0;
+    std::cout << "FACE: " << info << '\n';
     
-    std::array<int, 9> faceValues;
+    Face newFace;
     
-    while(getline(infoStream, index, ' ')) {
-        std::istringstream secondaryStream(index);
-        
-        while(getline(secondaryStream, token, '/')) {
-            faceValues[i] = (token.empty()) ? 0 : std::stoi(token);
-            i++;
-            tokenCount++;
-        }
+    std::istringstream iss(info);
+    std::string vertexInfo;
+    while(getline(iss, vertexInfo, ' ')) {
+        newFace.mVertexIndices.push_back(vertexInfo[0] - '0' - 1); // Convert numeric character into an integer
     }
     
-    if (tokenCount == 3) {
-        faceValues[3] = faceValues[1];
-        faceValues[6] = faceValues[2];
-        
-        faceValues[1] = 0;
-        faceValues[2] = 0;
-        
-        faceValues[4] = 0;
-        faceValues[5] = 0;
-        
-        faceValues[7] = 0;
-        faceValues[8] = 0;
+    Eigen::Vector3d BA = (mHomogeneousVertices[newFace.mVertexIndices[1]] - mHomogeneousVertices[newFace.mVertexIndices[0]]).head<3>();
+    Eigen::Vector3d CB = (mHomogeneousVertices[newFace.mVertexIndices[2]] - mHomogeneousVertices[newFace.mVertexIndices[1]]).head<3>();
+    
+    newFace.mNormal = BA.cross(CB);
+    newFace.mNormal = newFace.mNormal / newFace.mNormal.norm();
+    
+    mFaces.push_back(newFace);
+    
+    std::cout << "A(" << mFaces.back().mVertexIndices[0] + 1 << "):\t";
+    for (int i = 0; i < 4; i++) {
+        std::cout << mHomogeneousVertices[mFaces.back().mVertexIndices[0]](i) << ' ';
+    }
+    std::cout << "\nB(" << mFaces.back().mVertexIndices[1] + 1 << "):\t";
+    for (int i = 0; i < 4; i++) {
+        std::cout << mHomogeneousVertices[mFaces.back().mVertexIndices[1]](i) << ' ';
+    }
+    std::cout << "\nC(" << mFaces.back().mVertexIndices[2] + 1 << "):\t";
+    for (int i = 0; i < 4; i++) {
+        std::cout << mHomogeneousVertices[mFaces.back().mVertexIndices[2]](i) << ' ';
     }
     
-    mFaces.push_back(faceValues);
+    std::cout << "\nBA:\t";
+    for (int i = 0; i < 3; i++) {
+        std::cout << BA(i) << ' ';
+    }
+    std::cout << "\nCB:\t";
+    for (int i = 0; i < 3; i++) {
+        std::cout << CB(i) << ' ';
+    }
+    
+    std::cout << "\nNormal\n" << mFaces.back().mNormal << "\n\n";
 }
 
 
@@ -200,9 +252,9 @@ double Object::sum_absolute_translations() {
     
     for (size_t i = 0; i < mVertices.size(); i++) {
         
-        xDiff = fabs(mVertices[i](0) - mOldVertices[i](0));
-        yDiff = fabs(mVertices[i](1) - mOldVertices[i](1));
-        zDiff = fabs(mVertices[i](2) - mOldVertices[i](2));
+        xDiff = fabs(mVertices[i](0) - mOldHomogeneousVertices[i](0));
+        yDiff = fabs(mVertices[i](1) - mOldHomogeneousVertices[i](1));
+        zDiff = fabs(mVertices[i](2) - mOldHomogeneousVertices[i](2));
         difference = xDiff + yDiff + zDiff;
         
         sum += difference;
@@ -237,25 +289,25 @@ void Object::output(const std::string& fileName) {
     outFile << "s " << mSmoothing << '\n';
     
     int value;
-    for (size_t i = 0; i < mFaces.size(); i++) {
-        outFile << "f ";// << std::resetiosflags(std::ios::showbase);
-        
-        if (mFaces[i][2] == 0 && mFaces[i][5] == 0 && mFaces[i][8] == 0) {
-            outFile << mFaces[i][0] << ' '
-                    << mFaces[i][3] << ' '
-                    << mFaces[i][6] << '\n';
-        }
-        else {
-            for (int j = 0; j < 9; j++) {
-                value = mFaces[i][j];
-                if (value != 0) outFile << value;
-                
-                if ((j == 0 || j == 1) || (j == 3 || j==4) || (j == 6 || j == 7)) outFile << '/';
-                else if (j == 2 || j == 5) outFile << ' ';
-                else outFile << '\n';
-            }
-        }
-    }
+//    for (size_t i = 0; i < mFaces.size(); i++) {
+//        outFile << "f ";// << std::resetiosflags(std::ios::showbase);
+//
+//        if (mFaces[i][2] == 0 && mFaces[i][5] == 0 && mFaces[i][8] == 0) {
+//            outFile << mFaces[i][0] << ' '
+//                    << mFaces[i][3] << ' '
+//                    << mFaces[i][6] << '\n';
+//        }
+//        else {
+//            for (int j = 0; j < 9; j++) {
+//                value = mFaces[i][j];
+//                if (value != 0) outFile << value;
+//
+//                if ((j == 0 || j == 1) || (j == 3 || j==4) || (j == 6 || j == 7)) outFile << '/';
+//                else if (j == 2 || j == 5) outFile << ' ';
+//                else outFile << '\n';
+//            }
+//        }
+//    }
     
     for (size_t i = 0; i < mLines.size(); i++) {
         outFile << "l ";
