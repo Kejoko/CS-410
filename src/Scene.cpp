@@ -168,96 +168,6 @@ Ray Scene::determine_pixelray(int pixw, int pixh) {
 
 
 
-
-void Scene::shoot_ray(const Ray& ray, std::shared_ptr<Sphere>& bestSphere, Eigen::Vector3d& surfacePoint, int pixw, int pixh) {
-    bestSphere = nullptr;
-    
-    double minDistance = DBL_MAX;
-    double v, r2, c2, d, t;
-    std::shared_ptr<Sphere> currentSphere;
-    Eigen::Vector3d rayToCenter;
-    
-    for (int i = 0; i < mpObjects.size(); i++) {
-        currentSphere = std::static_pointer_cast<Sphere>(mpObjects[i]);
-        
-        rayToCenter = currentSphere->mPosition - ray.mPosition;
-        
-        v = rayToCenter.dot(ray.mDirection);
-        
-        r2 = currentSphere->mRadius * currentSphere->mRadius;
-        
-        c2 = rayToCenter.dot(rayToCenter);
-        
-        d = r2 - (c2 - (v * v));
-        
-        if (d > 0.0) {
-            t = v - sqrt(d);
-            if (t < minDistance) {
-                bestSphere = currentSphere;
-                minDistance = t;
-                surfacePoint = ray.mPosition + t * ray.mDirection;
-            }
-        }
-    }
-}
-
-
-
-
-
-Eigen::Vector3d Scene::color_sphere_point(const std::shared_ptr<Sphere>& sphere, const Eigen::Vector3d& surfacePoint) {
-    Eigen::Vector3d surfaceNormal = surfacePoint - sphere->mPosition;
-    surfaceNormal = surfaceNormal / surfaceNormal.norm();
-
-    Eigen::Vector3d rgb;
-    rgb(0) = mAmbientLight.mColor(0) * sphere->mAmbientReflection(0);
-    rgb(1) = mAmbientLight.mColor(1) * sphere->mAmbientReflection(1);
-    rgb(2) = mAmbientLight.mColor(2) * sphere->mAmbientReflection(2);
-    
-    Eigen::Vector3d surfacePointToLight;
-    for (int i = 0; i < mPointLights.size(); i++) {
-        surfacePointToLight = mPointLights[i].mPosition - surfacePoint;
-        surfacePointToLight = surfacePointToLight / surfacePointToLight.norm();
-        
-        double strength = surfaceNormal.dot(surfacePointToLight);
-        if (strength > 0.0) {
-            rgb(0) += (mPointLights[i].mColor(0) * sphere->mDiffuseReflection(0)) * strength;
-            rgb(1) += (mPointLights[i].mColor(1) * sphere->mDiffuseReflection(1)) * strength;
-            rgb(2) += (mPointLights[i].mColor(2) * sphere->mDiffuseReflection(2)) * strength;
-        }
-    }
-    
-    return rgb;
-}
-
-
-
-
-
-Eigen::Vector3d Scene::determine_pixel_colors(int pixw, int pixh) {
-    Ray ray = determine_pixelray(pixw, pixh);
-    
-    std::shared_ptr<Sphere> sphere;
-    Eigen::Vector3d surfacePoint;
-    shoot_ray(ray, sphere, surfacePoint, pixw, pixh);
-    
-    Eigen::Vector3d rgb;
-    if (sphere != nullptr) {
-        rgb = color_sphere_point(sphere, surfacePoint);
-    }
-    else {
-        rgb(0) = 0;
-        rgb(1) = 0;
-        rgb(2) = 0;
-    }
-    
-    return convert_to_255(rgb);
-}
-
-
-
-
-
 Eigen::Vector3d Scene::raytrace(Ray& ray) {
     Eigen::Vector3d color(0, 0, 0);
     
@@ -356,8 +266,6 @@ void Scene::render(const std::string& imageName) {
             Ray ray = determine_pixelray(j, i);
             pixelColors = raytrace(ray);
             std::cout << "\n\n\n";
-            
-//            pixelColors = determine_pixel_colors(j, i);
             
             output << pixelColors(0) << ' ' << pixelColors(1) << ' ' << pixelColors(2);
             

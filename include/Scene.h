@@ -74,9 +74,6 @@ public:
     void create_object(const std::string& line, const Eigen::Matrix4d& transformationMatrix);
     
     Ray determine_pixelray(int pixw, int pixh);
-    void shoot_ray(const Ray& ray, std::shared_ptr<Sphere>& bestSphere, Eigen::Vector3d& surfacePoint, int pixw, int pixh);
-    Eigen::Vector3d color_sphere_point(const std::shared_ptr<Sphere>& sphere, const Eigen::Vector3d& surfacePoint);
-    Eigen::Vector3d determine_pixel_colors(int pixw, int pixh);
     Eigen::Vector3d raytrace(Ray& ray);
     void render(const std::string& imageName);
 };
