@@ -6,6 +6,8 @@
 
 #include <math.h>
 
+#include <cfloat>
+
 #include <iostream>
 #include <fstream>
 #include <memory>
@@ -14,9 +16,13 @@
 
 #include <Eigen/Dense>
 
+#include "Face.h"
 #include "Material.h"
+#include "Ray.h"
 
 bool has_printed_mat = false;
+
+int Object::msObjectCount = 0;
 
 Object::Object() {
     
@@ -24,6 +30,7 @@ Object::Object() {
 
 Object::Object(const std::string& fileName, const Eigen::Matrix4d& transformationMatrix) {
     std::cout << "--- Object: " << fileName << " ---\n";
+    mObjectId = msObjectCount++;
     
     std::istringstream fileNameStream(fileName);
     fileNameStream >> mFileName;
@@ -243,6 +250,57 @@ void Object::handle_line(const std::string& info) {
     }
     
     mLines.push_back(line);
+}
+
+
+
+
+
+double Object::ray_intersect(Ray& ray, Face& bestFace) {
+    std::cout << "Ray intersect: object\n";
+    
+    double t, beta, gamma;
+    double tBest = DBL_MAX;
+    
+    Eigen::Vector3d A, B, C, rtoa, result;
+    Eigen::Matrix3d MM, MMinverse;
+    
+    for (auto currFace : mFaces) {
+        std::cout << "Checking face\n";
+        A = mVertices[currFace.mVertexIndices[0]];
+        B = mVertices[currFace.mVertexIndices[1]];
+        C = mVertices[currFace.mVertexIndices[2]];
+        
+        rtoa = A - ray.mPosition;
+        std::cout << "rtoa\n" << rtoa << '\n';
+        
+        MM <<   (A-B)(0), (A-C)(0), ray.mDirection(0),
+                (A-B)(1), (A-C)(1), ray.mDirection(1),
+                (A-B)(2), (A-C)(2), ray.mDirection(2);
+        
+        MMinverse = MM.inverse();
+        
+        result = MMinverse * rtoa;
+        
+        beta = result(0);
+        gamma = result(1);
+        t = result(2);
+        std::cout << "b:\t" << beta << '\n';
+        std::cout << "g:\t" << gamma << '\n';
+        std::cout << "t:\t" << t << '\n';
+        
+        if (beta > 0.0 && gamma > 0.0 && (beta + gamma) < 1.0 && t > 0.0) {
+            std::cout << "Face\n";
+            if (t < tBest) {
+                std::cout << "New best face\n";
+                tBest = t;
+                bestFace = currFace;
+            }
+        }
+    }
+    
+    std::cout << "best\t" << tBest << '\n';
+    return tBest;
 }
 
 

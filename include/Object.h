@@ -13,20 +13,14 @@
 
 #include <Eigen/Dense>
 
+#include "Face.h"
 #include "Material.h"
+#include "Ray.h"
 
 class Object {
 public:
-    
-    struct Face_t {
-        std::vector<int> mVertexIndices;
-        
-        Eigen::Vector3d mNormal;
-        
-        std::shared_ptr<Material> mMaterial;
-    }; typedef Face_t Face;
-    
-    
+    static int msObjectCount;
+    int mObjectId;
     
     Object();
     Object(const std::string& fileName, const Eigen::Matrix4d& transformationMatrix);
@@ -49,6 +43,8 @@ public:
     void update_current_material(const std::string& materialName);
     void handle_face(const std::string& info);
     void handle_line(const std::string& info);
+    
+    virtual double ray_intersect(Ray& ray, Face& bestFace);
     
     double sum_absolute_translations();
     void output(const std::string& fileName);

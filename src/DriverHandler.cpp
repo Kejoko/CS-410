@@ -77,7 +77,7 @@ void DriverHandler::read_driver() {
 
 
 void DriverHandler::output_result() {
-    mScene.output_image(mOutFileName);
+    mScene.render(mOutFileName);
 }
 
 
