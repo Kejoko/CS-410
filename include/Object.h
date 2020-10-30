@@ -17,7 +17,7 @@
 #include "Material.h"
 #include "Ray.h"
 
-class Object {
+class Object : public std::enable_shared_from_this<Object> {
 public:
     static int msObjectCount;
     int mObjectId;
@@ -44,7 +44,7 @@ public:
     void handle_face(const std::string& info);
     void handle_line(const std::string& info);
     
-    virtual double ray_intersect(Ray& ray, Face& bestFace);
+    virtual void ray_intersect(const Ray& ray, std::shared_ptr<Object>& pBestObject, Face& bestFace, double& bestT);
     
     double sum_absolute_translations();
     void output(const std::string& fileName);

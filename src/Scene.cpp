@@ -151,13 +151,13 @@ Eigen::Vector3d convert_to_255(const Eigen::Vector3d& rgb) {
 
 
 
-Ray Scene::determine_pixelray(int pixw, int pixh) {
+Ray Scene::determine_pixelray(int i, int j) {
     Ray ray;
     
-    double xOffset = pixw / (mImageWidth - 1) * (mCamera.mRightBound - mCamera.mLeftBound) + mCamera.mLeftBound;
-    double yOffset = pixh / (mImageHeight - 1) * (mCamera.mBottomBound - mCamera.mTopBound) + mCamera.mTopBound;
+    double px = i / (mImageWidth - 1) * (mCamera.mRightBound - mCamera.mLeftBound) + mCamera.mLeftBound;
+    double py = j / (mImageHeight - 1) * (mCamera.mBottomBound - mCamera.mTopBound) + mCamera.mTopBound;
     
-    ray.mPosition = mCamera.mEyePosition + (xOffset * mCamera.mUDirection) + (yOffset * mCamera.mVDirection) + (mCamera.mNearClippingPlane * mCamera.mWDirection);
+    ray.mPosition = mCamera.mEyePosition + (mCamera.mNearClippingPlane * mCamera.mWDirection) + (px * mCamera.mUDirection) + (py * mCamera.mVDirection);
     
     ray.mDirection = ray.mPosition - mCamera.mEyePosition;
     ray.mDirection = ray.mDirection / ray.mDirection.norm();
@@ -172,19 +172,16 @@ Eigen::Vector3d Scene::raytrace(Ray& ray) {
     Eigen::Vector3d color(0, 0, 0);
     
     std::shared_ptr<Object> pBestObject = nullptr;
-    Face face, bestFace;
+    Face bestFace;
     Eigen::Vector3d bestPoint;
     bool hit = false;
-    double t;
-    double tBest = DBL_MAX;
+    double bestT = DBL_MAX;
     
     for (auto pObject : mpObjects) {
-        t = pObject->ray_intersect(ray, face);
-        if (t > 0.0 && t < tBest) {
-            tBest = t;
-            pBestObject = pObject;
-            bestFace = face;
-            bestPoint = ray.mPosition + t * ray.mDirection;
+        pObject->ray_intersect(ray, pBestObject, bestFace, bestT);
+        
+        if (pBestObject != nullptr) {
+            bestPoint = ray.mPosition + bestT * ray.mDirection;
             hit = true;
         }
     }
@@ -199,8 +196,6 @@ Eigen::Vector3d Scene::raytrace(Ray& ray) {
         
         std::shared_ptr<Sphere> pSphere = std::dynamic_pointer_cast<Sphere>(pBestObject);
         if (pSphere) {
-            std::cout << "Best: Sphere " << pSphere->mSphereId << '\n';
-            
             surfaceNormal = bestPoint - pSphere->mPosition;
             surfaceNormal = surfaceNormal / surfaceNormal.norm();
             
@@ -211,8 +206,6 @@ Eigen::Vector3d Scene::raytrace(Ray& ray) {
             illumination = 3;
         }
         else {
-            std::cout << "Best: Object " << pBestObject->mObjectId << '\n';
-            
             surfaceNormal = bestFace.mNormal;
             
             matAmbient = bestFace.mMaterial->mAmbient;
@@ -221,13 +214,15 @@ Eigen::Vector3d Scene::raytrace(Ray& ray) {
             specularExponent = bestFace.mMaterial->mSpecularExponent;
             illumination = bestFace.mMaterial->mIllumination;
         }
+        std::cout << "Point : " << bestPoint(0) << ' ' << bestPoint(1) << ' ' << bestPoint(2) << '\n';
+        std::cout << "Normal: " << surfaceNormal(0) << ' ' << surfaceNormal(1) << ' ' << surfaceNormal(2) << '\n';
         
         color(0) = mAmbientLight.mColor(0) * matAmbient(0);
         color(1) = mAmbientLight.mColor(1) * matAmbient(1);
         color(2) = mAmbientLight.mColor(2) * matAmbient(2);
         
-        Eigen::Vector3d ptol;
-        double surfaceProjection = -1;
+        Eigen::Vector3d ptol, ptor, spr;
+        double surfaceProjection, cdr;
         
         for (auto light : mPointLights) {
             ptol = light.mPosition - bestPoint;
@@ -238,11 +233,25 @@ Eigen::Vector3d Scene::raytrace(Ray& ray) {
                 color(0) += light.mColor(0) * matDiffuse(0) * surfaceProjection;
                 color(1) += light.mColor(1) * matDiffuse(1) * surfaceProjection;
                 color(2) += light.mColor(2) * matDiffuse(2) * surfaceProjection;
+                
+                ptor = ray.mPosition - bestPoint;
+                ptor = ptor / ptor.norm();
+                
+                spr = (2 * surfaceProjection * surfaceNormal) - ptol;
+                spr = spr / spr.norm();
+                
+                cdr = ptor.dot(spr);
+                
+                if (cdr > 0.0) {
+                        color(0) += light.mColor(0) * matSpecular(0) * (pow(cdr, specularExponent));
+                        color(1) += light.mColor(1) * matSpecular(1) * (pow(cdr, specularExponent));
+                        color(2) += light.mColor(2) * matSpecular(2) * (pow(cdr, specularExponent));
+                }
             }
         }
     }
     
-    std::cout << "Result\n" << convert_to_255(color) << '\n';
+    std::cout << "Result\n" << color << '\n';
     return convert_to_255(color);
 }
 
@@ -257,23 +266,28 @@ void Scene::render(const std::string& imageName) {
     
     std::ofstream output(imageName);
     Eigen::Vector3d pixelColors;
+    Ray ray;
     
     output << "P3\n";
     output << mImageWidth << ' ' << mImageHeight << ' ' << "255\n";
-    for (int i = 0; i < mImageHeight; i++) {
-        for (int j = 0; j < mImageWidth; j++) {
+    for (int i = 0; i < mImageWidth; i++) {
+        for (int j = 0; j < mImageHeight; j++) {
             std::cout << i << " , " << j << '\n';
-            Ray ray = determine_pixelray(j, i);
+            ray = determine_pixelray(j, i);
+            std::cout << "ray p: " << ray.mPosition(0) << ' ' << ray.mPosition(1) << ' ' << ray.mPosition(2) << '\n';
+            std::cout << "ray d: " << ray.mDirection(0) << ' ' << ray.mDirection(1) << ' ' << ray.mDirection(2) << '\n';
             pixelColors = raytrace(ray);
-            std::cout << "\n\n\n";
+            std::cout << "\n\n\n\n\n\n\n\n\n\n\n";
             
             output << pixelColors(0) << ' ' << pixelColors(1) << ' ' << pixelColors(2);
             
             if (j < mImageHeight - 1) {
                 output << ' ';
             }
+            else {
+                output << '\n';
+            }
         }
-        output << '\n';
     }
     
     output.close();

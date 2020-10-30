@@ -11,13 +11,21 @@
 #include <Eigen/Dense>
 
 #include "Material.h"
+#include "Ray.h"
 
-struct Face_t {
+class Object;
+
+class Face {
+public:
+    Face();
+    
     std::vector<int> mVertexIndices;
-    
     Eigen::Vector3d mNormal;
-    
     std::shared_ptr<Material> mMaterial;
-}; typedef Face_t Face;
+    
+    Object* mpObject;
+    
+    void ray_intersect(const Ray&, bool& hit, double& t);
+};;
 
 #endif //FACE_H

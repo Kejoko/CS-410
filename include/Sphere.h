@@ -28,7 +28,7 @@ public:
     Eigen::Vector3d mSpecularReflection;
     Eigen::Vector3d mAttenuationReflection;
     
-    double ray_intersect(Ray& ray, Face& bestFace) override;
+    void ray_intersect(const Ray& ray, std::shared_ptr<Object>& pBestObject, Face& bestFace, double& bestT) override;
 };
 
 #endif //SPHERE_H

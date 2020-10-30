@@ -41,41 +41,43 @@ Object::Object(const std::string& fileName, const Eigen::Matrix4d& transformatio
     bool has_printed_v = false;
     
     while(getline(objReader, line)) {
-        std::istringstream iss(line);
-        iss >> word;
-        
-        if (word == "v") {
-            handle_vertex(line.substr(2, std::string::npos), transformationMatrix);
-        }
-        else if (word == "vn") {
-            handle_vertex_normal(line.substr(3, std::string::npos), transformationMatrix);
-        }
-        else if (word == "s") {
-            handle_smoothing(line.substr(2, std::string::npos));
-        }
-        else if (word == "mtllib") {
-            create_material_library(line.substr(word.length() + 1, std::string::npos));
-        }
-        else if (word == "usemtl") {
-            if (!has_printed_v) {
-                std::cout << "\n\n----- ----- vertices ----- -----\n";
-                for (int i = 0; i < mVertices.size(); i++) {
-                    std::cout << "V " << i+1 << '\t';
-                    for (int j = 0; j < 3; j++) {
-                        std::cout << mVertices[i](j) << ' ';
-                    }
-                    std::cout << '\n';
-                }
-                std::cout << "----- ----- ----- ----- -----\n\n\n";
-                has_printed_v = true;
+        if (!line.empty()) {
+            std::istringstream iss(line);
+            iss >> word;
+            
+            if (word == "v") {
+                handle_vertex(line.substr(2, std::string::npos), transformationMatrix);
             }
-            update_current_material(line.substr(word.length() + 1, std::string::npos));
-        }
-        else if (word == "f") {
-            handle_face(line.substr(2, std::string::npos));
-        }
-        else if (word == "l") {
-            handle_line(line.substr(2, std::string::npos));
+            else if (word == "vn") {
+                handle_vertex_normal(line.substr(3, std::string::npos), transformationMatrix);
+            }
+            else if (word == "s") {
+                handle_smoothing(line.substr(2, std::string::npos));
+            }
+            else if (word == "mtllib") {
+                create_material_library(line.substr(word.length() + 1, std::string::npos));
+            }
+            else if (word == "usemtl") {
+                if (!has_printed_v) {
+                    std::cout << "\n\n----- ----- vertices ----- -----\n";
+                    for (int i = 0; i < mVertices.size(); i++) {
+                        std::cout << "V " << i+1 << '\t';
+                        for (int j = 0; j < 3; j++) {
+                            std::cout << mVertices[i](j) << ' ';
+                        }
+                        std::cout << '\n';
+                    }
+                    std::cout << "----- ----- ----- ----- -----\n\n\n";
+                    has_printed_v = true;
+                }
+                update_current_material(line.substr(word.length() + 1, std::string::npos));
+            }
+            else if (word == "f") {
+                handle_face(line.substr(2, std::string::npos));
+            }
+            else if (word == "l") {
+                handle_line(line.substr(2, std::string::npos));
+            }
         }
     }
     
@@ -209,6 +211,8 @@ void Object::handle_face(const std::string& info) {
     
     newFace.mMaterial = mCurrentMaterial;
     
+    newFace.mpObject = this;
+    
     mFaces.push_back(newFace);
     
     std::cout << mFaces.back().mMaterial->mName << '\n';
@@ -256,44 +260,27 @@ void Object::handle_line(const std::string& info) {
 
 
 
-double Object::ray_intersect(Ray& ray, Face& bestFace) {
-    std::cout << "Ray intersect: object\n";
+void Object::ray_intersect(const Ray& ray, std::shared_ptr<Object>& pBestObject, Face& bestFace, double& bestT) {
+//    std::cout << "Ray intersect: object\n";
     
-    double t, beta, gamma;
-    double tBest = DBL_MAX;
+    bool hit;
+    double t;
     
     Eigen::Vector3d A, B, C, rtoa, result;
     Eigen::Matrix3d MM, MMinverse;
     
     for (auto currFace : mFaces) {
-        A = mVertices[currFace.mVertexIndices[0]];
-        B = mVertices[currFace.mVertexIndices[1]];
-        C = mVertices[currFace.mVertexIndices[2]];
-        
-        rtoa = A - ray.mPosition;
-        
-        MM <<   (A-B)(0), (A-C)(0), ray.mDirection(0),
-                (A-B)(1), (A-C)(1), ray.mDirection(1),
-                (A-B)(2), (A-C)(2), ray.mDirection(2);
-        
-        MMinverse = MM.inverse();
-        
-        result = MMinverse * rtoa;
-        
-        beta = result(0);
-        gamma = result(1);
-        t = result(2);
-        
-        if (beta > 0.0 && gamma > 0.0 && (beta + gamma) < 1.0 && t > 0.0) {
-            std::cout << "Face\n";
-            if (t < tBest) {
-                std::cout << "New best face:\t" << t << '\n';
-                tBest = t;
+        currFace.ray_intersect(ray, hit, t);
+        if (hit) {
+            std::cout << "----- HIT -----\t" << t << '\n';
+            if (t > 0.0 && t < bestT) {
+                std::cout << "----- ----- New best face: " << t << '\n';
+                pBestObject = shared_from_this();
+                bestT = t;
                 bestFace = currFace;
             }
         }
     }
-    return tBest;
 }
 
 

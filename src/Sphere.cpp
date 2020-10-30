@@ -32,7 +32,7 @@ Sphere::Sphere(const std::string& line) : Object() {
 
 
 
-double Sphere::ray_intersect(Ray& ray, Face& bestFace) {
+void Sphere::ray_intersect(const Ray& ray, std::shared_ptr<Object>& pBestObject, Face& bestFace, double& bestT) {
     double v, r2, c2, d;
     double t = DBL_MAX;
     Eigen::Vector3d rtoc;
@@ -47,7 +47,10 @@ double Sphere::ray_intersect(Ray& ray, Face& bestFace) {
     
     if (d > 0.0) {
         t = v - sqrt(d);
+        
+        if (t < bestT) {
+            bestT = t;
+            pBestObject = shared_from_this();
+        }
     }
-    
-    return t;
 }
