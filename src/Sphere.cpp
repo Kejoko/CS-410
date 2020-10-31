@@ -48,7 +48,7 @@ void Sphere::ray_intersect(const Ray& ray, std::shared_ptr<Object>& pBestObject,
     if (d > 0.0) {
         t = v - sqrt(d);
         
-        if (t < bestT) {
+        if (t < bestT && t > 0.0) {
             bestT = t;
             pBestObject = shared_from_this();
         }

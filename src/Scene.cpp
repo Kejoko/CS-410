@@ -221,31 +221,55 @@ Eigen::Vector3d Scene::raytrace(Ray& ray) {
         color(1) = mAmbientLight.mColor(1) * matAmbient(1);
         color(2) = mAmbientLight.mColor(2) * matAmbient(2);
         
-        Eigen::Vector3d ptol, ptor, spr;
+        Eigen::Vector3d pointToLight, pointToRay, spr;
         double surfaceProjection, cdr;
         
+        Ray rayToLight;
+        double blockingT = DBL_MAX;
+        std::shared_ptr<Object> pBlockingObject = nullptr;
+        Face blockingFace;
+        bool blocked = false;
+        
         for (auto light : mPointLights) {
-            ptol = light.mPosition - bestPoint;
-            ptol = ptol / ptol.norm();
+            pointToLight = light.mPosition - bestPoint;
+            pointToLight = pointToLight / pointToLight.norm();
             
-            surfaceProjection = surfaceNormal.dot(ptol);
-            if (surfaceProjection > 0.0) {
-                color(0) += light.mColor(0) * matDiffuse(0) * surfaceProjection;
-                color(1) += light.mColor(1) * matDiffuse(1) * surfaceProjection;
-                color(2) += light.mColor(2) * matDiffuse(2) * surfaceProjection;
+            rayToLight.mPosition = bestPoint;
+            rayToLight.mDirection = pointToLight;
+            
+            for (auto pObject : mpObjects) {
+                if (blocked) {
+                    break;
+                }
                 
-                ptor = ray.mPosition - bestPoint;
-                ptor = ptor / ptor.norm();
-                
-                spr = (2 * surfaceProjection * surfaceNormal) - ptol;
-                spr = spr / spr.norm();
-                
-                cdr = ptor.dot(spr);
-                
-                if (cdr > 0.0) {
-                        color(0) += light.mColor(0) * matSpecular(0) * (pow(cdr, specularExponent));
-                        color(1) += light.mColor(1) * matSpecular(1) * (pow(cdr, specularExponent));
-                        color(2) += light.mColor(2) * matSpecular(2) * (pow(cdr, specularExponent));
+                if (pObject != pBestObject) {
+                    pObject->ray_intersect(rayToLight, pBlockingObject, bestFace, blockingT);
+                    if (pBlockingObject != nullptr) {
+                        blocked = true;
+                    }
+                }
+            }
+            
+            if (!blocked) {
+                surfaceProjection = surfaceNormal.dot(pointToLight);
+                if (surfaceProjection > 0.0) {
+                    color(0) += light.mColor(0) * matDiffuse(0) * surfaceProjection;
+                    color(1) += light.mColor(1) * matDiffuse(1) * surfaceProjection;
+                    color(2) += light.mColor(2) * matDiffuse(2) * surfaceProjection;
+                    
+                    pointToRay = ray.mPosition - bestPoint;
+                    pointToRay = pointToRay / pointToRay.norm();
+                    
+                    spr = (2 * surfaceProjection * surfaceNormal) - pointToLight;
+                    spr = spr / spr.norm();
+                    
+                    cdr = pointToRay.dot(spr);
+                    
+                    if (cdr > 0.0) {
+                            color(0) += light.mColor(0) * matSpecular(0) * (pow(cdr, specularExponent));
+                            color(1) += light.mColor(1) * matSpecular(1) * (pow(cdr, specularExponent));
+                            color(2) += light.mColor(2) * matSpecular(2) * (pow(cdr, specularExponent));
+                    }
                 }
             }
         }
