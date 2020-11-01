@@ -74,7 +74,7 @@ public:
     void create_object(const std::string& line, const Eigen::Matrix4d& transformationMatrix);
     
     Ray determine_pixelray(int pixw, int pixh);
-    Eigen::Vector3d raytrace(Ray& ray);
+    Eigen::Vector3d raytrace(Ray& ray, int depth);
     void render(const std::string& imageName);
 };
 

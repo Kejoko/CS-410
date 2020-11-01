@@ -199,8 +199,11 @@ void Object::handle_face(const std::string& info) {
     
     std::istringstream iss(info);
     std::string vertexInfo;
+    int vertexIndex;
     while(getline(iss, vertexInfo, ' ')) {
-        newFace.mVertexIndices.push_back(vertexInfo[0] - '0' - 1); // Convert numeric character into an integer
+        std::istringstream vertexIndexer(vertexInfo);
+        vertexIndexer >> vertexIndex;
+        newFace.mVertexIndices.push_back(vertexIndex - 1);
     }
     
     Eigen::Vector3d BA = (mHomogeneousVertices[newFace.mVertexIndices[1]] - mHomogeneousVertices[newFace.mVertexIndices[0]]).head<3>();
@@ -216,15 +219,15 @@ void Object::handle_face(const std::string& info) {
     mFaces.push_back(newFace);
     
     std::cout << mFaces.back().mMaterial->mName << '\n';
-    std::cout << "A(" << mFaces.back().mVertexIndices[0] + 1 << "):\t";
+    std::cout << "A(" << mFaces.back().mVertexIndices[0] << "):\t";
     for (int i = 0; i < 4; i++) {
         std::cout << mHomogeneousVertices[mFaces.back().mVertexIndices[0]](i) << ' ';
     }
-    std::cout << "\nB(" << mFaces.back().mVertexIndices[1] + 1 << "):\t";
+    std::cout << "\nB(" << mFaces.back().mVertexIndices[1] << "):\t";
     for (int i = 0; i < 4; i++) {
         std::cout << mHomogeneousVertices[mFaces.back().mVertexIndices[1]](i) << ' ';
     }
-    std::cout << "\nC(" << mFaces.back().mVertexIndices[2] + 1 << "):\t";
+    std::cout << "\nC(" << mFaces.back().mVertexIndices[2] << "):\t";
     for (int i = 0; i < 4; i++) {
         std::cout << mHomogeneousVertices[mFaces.back().mVertexIndices[2]](i) << ' ';
     }
@@ -270,11 +273,11 @@ void Object::ray_intersect(const Ray& ray, std::shared_ptr<Object>& pBestObject,
     Eigen::Matrix3d MM, MMinverse;
     
     for (auto currFace : mFaces) {
+        hit = false;
         currFace.ray_intersect(ray, hit, t);
         if (hit) {
-            std::cout << "----- HIT -----\t" << t << '\n';
             if (t > 0.0 && t < bestT) {
-                std::cout << "----- ----- New best face: " << t << '\n';
+//                std::cout << "----- ----- New best face: " << t << '\n';
                 pBestObject = shared_from_this();
                 bestT = t;
                 bestFace = currFace;

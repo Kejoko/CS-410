@@ -151,11 +151,11 @@ Eigen::Vector3d convert_to_255(const Eigen::Vector3d& rgb) {
 
 
 
-Ray Scene::determine_pixelray(int i, int j) {
+Ray Scene::determine_pixelray(int pixh, int pixw) {
     Ray ray;
     
-    double px = i / (mImageWidth - 1) * (mCamera.mRightBound - mCamera.mLeftBound) + mCamera.mLeftBound;
-    double py = j / (mImageHeight - 1) * (mCamera.mBottomBound - mCamera.mTopBound) + mCamera.mTopBound;
+    double py = pixh / (mImageHeight - 1) * (mCamera.mBottomBound - mCamera.mTopBound) + mCamera.mTopBound;
+    double px = pixw / (mImageWidth - 1) * (mCamera.mRightBound - mCamera.mLeftBound) + mCamera.mLeftBound;
     
     ray.mPosition = mCamera.mEyePosition + (mCamera.mNearClippingPlane * mCamera.mWDirection) + (px * mCamera.mUDirection) + (py * mCamera.mVDirection);
     
@@ -168,12 +168,13 @@ Ray Scene::determine_pixelray(int i, int j) {
 
 
 
-Eigen::Vector3d Scene::raytrace(Ray& ray) {
+Eigen::Vector3d Scene::raytrace(Ray& ray, int depth) {
     Eigen::Vector3d color(0, 0, 0);
     
     std::shared_ptr<Object> pBestObject = nullptr;
     Face bestFace;
     Eigen::Vector3d bestPoint;
+    Eigen::Vector3d surfaceNormal;
     bool hit = false;
     double bestT = DBL_MAX;
     
@@ -187,10 +188,9 @@ Eigen::Vector3d Scene::raytrace(Ray& ray) {
     }
     
     if (hit) {
-        Eigen::Vector3d surfaceNormal(1, 0 ,0);
-        Eigen::Vector3d matAmbient(1, 1, 1);
-        Eigen::Vector3d matDiffuse(1, 1, 1);
-        Eigen::Vector3d matSpecular(1, 1, 1);
+        Eigen::Vector3d matAmbient;
+        Eigen::Vector3d matDiffuse;
+        Eigen::Vector3d matSpecular;
         double specularExponent;
         int illumination;
         
@@ -214,8 +214,8 @@ Eigen::Vector3d Scene::raytrace(Ray& ray) {
             specularExponent = bestFace.mMaterial->mSpecularExponent;
             illumination = bestFace.mMaterial->mIllumination;
         }
-        std::cout << "Point : " << bestPoint(0) << ' ' << bestPoint(1) << ' ' << bestPoint(2) << '\n';
-        std::cout << "Normal: " << surfaceNormal(0) << ' ' << surfaceNormal(1) << ' ' << surfaceNormal(2) << '\n';
+//        std::cout << "Point : " << bestPoint(0) << ' ' << bestPoint(1) << ' ' << bestPoint(2) << '\n';
+//        std::cout << "Normal: " << surfaceNormal(0) << ' ' << surfaceNormal(1) << ' ' << surfaceNormal(2) << '\n';
         
         color(0) = mAmbientLight.mColor(0) * matAmbient(0);
         color(1) = mAmbientLight.mColor(1) * matAmbient(1);
@@ -225,27 +225,27 @@ Eigen::Vector3d Scene::raytrace(Ray& ray) {
         double surfaceProjection, cdr;
         
         Ray rayToLight;
-        double blockingT = DBL_MAX;
+        double blockingT;
         std::shared_ptr<Object> pBlockingObject = nullptr;
         Face blockingFace;
         bool blocked = false;
         
         for (auto light : mPointLights) {
             pointToLight = light.mPosition - bestPoint;
+            blockingT = pointToLight.norm();
             pointToLight = pointToLight / pointToLight.norm();
             
             rayToLight.mPosition = bestPoint;
             rayToLight.mDirection = pointToLight;
             
+            
+            
             for (auto pObject : mpObjects) {
-                if (blocked) {
-                    break;
-                }
-                
                 if (pObject != pBestObject) {
                     pObject->ray_intersect(rayToLight, pBlockingObject, bestFace, blockingT);
                     if (pBlockingObject != nullptr) {
                         blocked = true;
+                        break;
                     }
                 }
             }
@@ -275,8 +275,18 @@ Eigen::Vector3d Scene::raytrace(Ray& ray) {
         }
     }
     
-    std::cout << "Result\n" << color << '\n';
-    return convert_to_255(color);
+    if (depth > 0 && hit) {
+        Ray recursiveRay;
+        recursiveRay.mPosition = bestPoint;
+        
+        Eigen::Vector3d inverseRayDirection = -1 * ray.mDirection;
+        recursiveRay.mDirection = 2 * surfaceNormal.dot(inverseRayDirection) * surfaceNormal - inverseRayDirection;
+        
+        return color + raytrace(recursiveRay, depth-1);
+    }
+    
+//    std::cout << "Result\n" << color << '\n';
+    return color;
 }
 
 
@@ -294,18 +304,18 @@ void Scene::render(const std::string& imageName) {
     
     output << "P3\n";
     output << mImageWidth << ' ' << mImageHeight << ' ' << "255\n";
-    for (int i = 0; i < mImageWidth; i++) {
-        for (int j = 0; j < mImageHeight; j++) {
+    for (int i = 0; i < mImageHeight; i++) {
+        for (int j = 0; j < mImageWidth; j++) {
             std::cout << i << " , " << j << '\n';
-            ray = determine_pixelray(j, i);
-            std::cout << "ray p: " << ray.mPosition(0) << ' ' << ray.mPosition(1) << ' ' << ray.mPosition(2) << '\n';
-            std::cout << "ray d: " << ray.mDirection(0) << ' ' << ray.mDirection(1) << ' ' << ray.mDirection(2) << '\n';
-            pixelColors = raytrace(ray);
-            std::cout << "\n\n\n\n\n\n\n\n\n\n\n";
+            ray = determine_pixelray(i, j);
+//            std::cout << "ray p: " << ray.mPosition(0) << ' ' << ray.mPosition(1) << ' ' << ray.mPosition(2) << '\n';
+//            std::cout << "ray d: " << ray.mDirection(0) << ' ' << ray.mDirection(1) << ' ' << ray.mDirection(2) << '\n';
+            pixelColors = convert_to_255(raytrace(ray, mRecursionLevel));
+//            std::cout << "\n\n\n\n\n\n\n\n\n\n\n";
             
             output << pixelColors(0) << ' ' << pixelColors(1) << ' ' << pixelColors(2);
             
-            if (j < mImageHeight - 1) {
+            if (j < mImageWidth - 1) {
                 output << ' ';
             }
             else {
