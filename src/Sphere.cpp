@@ -26,6 +26,8 @@ Sphere::Sphere(const std::string& line) : Object() {
     iss >> mRadius;
     iss >> mAmbientReflection(0) >> mAmbientReflection(1) >> mAmbientReflection(2);
     iss >> mDiffuseReflection(0) >> mDiffuseReflection(1) >> mDiffuseReflection(2);
+    iss >> mSpecularReflection(0) >> mSpecularReflection(1) >> mSpecularReflection(2);
+    iss >> mAttenuationReflection(0) >> mAttenuationReflection(1) >> mAttenuationReflection(2);
 }
 
 
@@ -48,7 +50,7 @@ void Sphere::ray_intersect(const Ray& ray, std::shared_ptr<Object>& pBestObject,
     if (d > 0.0) {
         t = v - sqrt(d);
         
-        if (t < bestT && t > 0.0) {
+        if (t < bestT && t > 0.000001) {
             bestT = t;
             pBestObject = shared_from_this();
         }

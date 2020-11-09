@@ -20,8 +20,6 @@
 #include "Material.h"
 #include "Ray.h"
 
-bool has_printed_mat = false;
-
 int Object::msObjectCount = 0;
 
 Object::Object() {
@@ -29,7 +27,6 @@ Object::Object() {
 }
 
 Object::Object(const std::string& fileName, const Eigen::Matrix4d& transformationMatrix) {
-    std::cout << "--- Object: " << fileName << " ---\n";
     mObjectId = msObjectCount++;
     
     std::istringstream fileNameStream(fileName);
@@ -58,18 +55,6 @@ Object::Object(const std::string& fileName, const Eigen::Matrix4d& transformatio
                 create_material_library(line.substr(word.length() + 1, std::string::npos));
             }
             else if (word == "usemtl") {
-                if (!has_printed_v) {
-                    std::cout << "\n\n----- ----- vertices ----- -----\n";
-                    for (int i = 0; i < mVertices.size(); i++) {
-                        std::cout << "V " << i+1 << '\t';
-                        for (int j = 0; j < 3; j++) {
-                            std::cout << mVertices[i](j) << ' ';
-                        }
-                        std::cout << '\n';
-                    }
-                    std::cout << "----- ----- ----- ----- -----\n\n\n";
-                    has_printed_v = true;
-                }
                 update_current_material(line.substr(word.length() + 1, std::string::npos));
             }
             else if (word == "f") {
@@ -101,27 +86,6 @@ void Object::handle_vertex(const std::string& info, const Eigen::Matrix4d& trans
     Eigen::Vector3d updatedVertex = mHomogeneousVertices.back().head<3>();
     updatedVertex = updatedVertex / mHomogeneousVertices.back()(3);
     mVertices.emplace_back(updatedVertex);
-    
-    if (!has_printed_mat) {
-        std::cout << "----- TRANSFORMATION MATRIX -----\n" << transformationMatrix << "\n----- ----- ----- ----- -----\n\n";
-        
-        has_printed_mat = true;
-    }
-    
-    std::cout << "VERTEX " << info << '\n';
-    std::cout << "old ";
-    for (int i = 0; i < 4; i++) {
-        std::cout << mOldHomogeneousVertices.back()(i) << ' ';
-    }
-    std::cout << "\nhom ";
-    for (int i = 0; i < 4; i++) {
-        std::cout << mHomogeneousVertices.back()(i) << ' ';
-    }
-    std::cout << "\nreg ";
-    for (int i = 0; i < 3; i++) {
-        std::cout << mVertices.back()(i) << ' ';
-    }
-    std::cout << "\n\n";
 }
 
 
@@ -151,8 +115,6 @@ void Object::handle_smoothing(const std::string& info) {
 
 
 void Object::create_material_library(const std::string& fileName) {
-    std::cout << "\n\n----- Material library: " << fileName << " -----\n";
-    
     std::ifstream materialLibraryStream(fileName);
     std::string line;
     std::string word;
@@ -170,7 +132,6 @@ void Object::create_material_library(const std::string& fileName) {
     }
     
     materialLibraryStream.close();
-    std::cout << "----- ----- ----- ----- ----- ----- -----\n\n\n";
 }
 
 
@@ -178,11 +139,9 @@ void Object::create_material_library(const std::string& fileName) {
 
 
 void Object::update_current_material(const std::string& materialName) {
-    std::cout << "-- Looking for material: " << materialName << " --\n";
     for (auto material : mMaterialLibrary) {
         if (material->mName == materialName) {
             mCurrentMaterial = material;
-            std::cout << "\tFound " << material->mName << '\n';
             break;
         }
     }
@@ -193,8 +152,6 @@ void Object::update_current_material(const std::string& materialName) {
 
 
 void Object::handle_face(const std::string& info) {
-    std::cout << "FACE: " << info << '\n';
-    
     Face newFace;
     
     std::istringstream iss(info);
@@ -217,31 +174,6 @@ void Object::handle_face(const std::string& info) {
     newFace.mpObject = this;
     
     mFaces.push_back(newFace);
-    
-    std::cout << mFaces.back().mMaterial->mName << '\n';
-    std::cout << "A(" << mFaces.back().mVertexIndices[0] << "):\t";
-    for (int i = 0; i < 4; i++) {
-        std::cout << mHomogeneousVertices[mFaces.back().mVertexIndices[0]](i) << ' ';
-    }
-    std::cout << "\nB(" << mFaces.back().mVertexIndices[1] << "):\t";
-    for (int i = 0; i < 4; i++) {
-        std::cout << mHomogeneousVertices[mFaces.back().mVertexIndices[1]](i) << ' ';
-    }
-    std::cout << "\nC(" << mFaces.back().mVertexIndices[2] << "):\t";
-    for (int i = 0; i < 4; i++) {
-        std::cout << mHomogeneousVertices[mFaces.back().mVertexIndices[2]](i) << ' ';
-    }
-    
-    std::cout << "\nBA:\t";
-    for (int i = 0; i < 3; i++) {
-        std::cout << BA(i) << ' ';
-    }
-    std::cout << "\nCB:\t";
-    for (int i = 0; i < 3; i++) {
-        std::cout << CB(i) << ' ';
-    }
-    
-    std::cout << "\nNormal\n" << mFaces.back().mNormal << "\n\n";
 }
 
 
@@ -264,8 +196,6 @@ void Object::handle_line(const std::string& info) {
 
 
 void Object::ray_intersect(const Ray& ray, std::shared_ptr<Object>& pBestObject, Face& bestFace, double& bestT) {
-//    std::cout << "Ray intersect: object\n";
-    
     bool hit;
     double t;
     
@@ -276,8 +206,7 @@ void Object::ray_intersect(const Ray& ray, std::shared_ptr<Object>& pBestObject,
         hit = false;
         currFace.ray_intersect(ray, hit, t);
         if (hit) {
-            if (t > 0.0 && t < bestT) {
-//                std::cout << "----- ----- New best face: " << t << '\n';
+            if (t > 0.000001 && t < bestT) {
                 pBestObject = shared_from_this();
                 bestT = t;
                 bestFace = currFace;

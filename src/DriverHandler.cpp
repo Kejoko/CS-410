@@ -67,8 +67,6 @@ void DriverHandler::read_driver() {
         }
     }
     
-    std::cout << "----- Done reading " << mInFileName << " -----\n";
-    
     driverStream.close();
 }
 

@@ -20,6 +20,7 @@ public:
     Eigen::Vector3d mAmbient;
     Eigen::Vector3d mDiffuse;
     Eigen::Vector3d mSpecular;
+    Eigen::Vector3d mReflectance;
     double mOpticalDensity = -1;
     double mDissolve = -1;
     int mIllumination = -1;
