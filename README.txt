@@ -5,7 +5,7 @@ kkochis@rams.colostate.edu
 
 ----- COMPILATION INSTRUCTIONS -----
 1. Open a terminal and `cd` into the directory containing the contents of the tar
-   file (the directory with the contents of "KeeganKochis02.tar")
+   file (the directory with the contents of "KeeganKochis03.tar")
 2. Run the command 'mkdir build; cd build`
 	* We will compile in the "build" directory in order to prevent cmake and make
 	  from polluting the top level directory
@@ -20,10 +20,14 @@ kkochis@rams.colostate.edu
 5. You should see the "raytracer" executable successfully built in your current directory
 
 ----- EXECUTION INSTRUCTIONS -----
-1. Once the "raytracer" executable has been built it can be run via the command line by
+1. Once the "raytracer" executable has been built you should cp or mv it to the directory
+   containing the .obj and .mtl files. The executable can be run via the command line by
    passing to it the desired driver file and the desired output file via command line
    arguments. Example executions are shown below. It should be noted that the executable
-   will error out if the proper number of arguments (2) are not passed to it.
+   will error out if the proper number of arguments (2) are not passed to it. It is
+   expected that the "raytracer" executable lives in the same directory as the .obj and
+   .mtl files that are requested in the driver file. If the executable is not in the
+   same directory as the .obj and .mtl files then it will not be able to read from them.
 	EX: ./raytracer driver00.txt driver00.ppm
 	EX: ./raytracer ~/Documents/drivers/driver12.txt ~/Desktop/output.ppm
 	EX: ./build/raytracer ../driver1000.txt ../solutions/driver1000.ppm

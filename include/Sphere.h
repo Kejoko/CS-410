@@ -9,12 +9,14 @@
 
 #include <Eigen/Dense>
 
+#include "Face.h"
 #include "Object.h"
+#include "Ray.h"
 
 class Sphere: public Object {
 public:
-    static int msCount;
-    int mId;
+    static int msSphereCount;
+    int mSphereId;
     
     Sphere() = default;
     Sphere(const std::string& line);
@@ -25,6 +27,8 @@ public:
     Eigen::Vector3d mDiffuseReflection;
     Eigen::Vector3d mSpecularReflection;
     Eigen::Vector3d mAttenuationReflection;
+    
+    void ray_intersect(const Ray& ray, std::shared_ptr<Object>& pBestObject, Face& bestFace, double& bestT) override;
 };
 
 #endif //SPHERE_H

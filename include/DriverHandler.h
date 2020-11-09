@@ -10,7 +10,6 @@
 
 #include <Eigen/Dense>
 
-#include "Object.h"
 #include "Scene.h"
 
 /*
@@ -30,7 +29,6 @@ public:
     Scene mScene;
     
     Eigen::Matrix4d mTransformationMatrix;
-    std::vector<Object> mObjects;
     
     void read_driver();
     void output_result();

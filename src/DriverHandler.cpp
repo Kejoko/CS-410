@@ -19,6 +19,8 @@
 DriverHandler::DriverHandler(const std::string& inFileName, const std::string& outFileName) {
     mInFileName = inFileName;
     mOutFileName = outFileName;
+    
+    update_matrix("clear");
 }
 
 
@@ -57,7 +59,7 @@ void DriverHandler::read_driver() {
                 update_matrix(line.substr(word.length() + 1, std::string::npos));
             }
             else if (word == "load") {
-                // Load .obj file and save it as object in mScene
+                mScene.create_object(line.substr(word.length() + 1, std::string::npos), mTransformationMatrix);
             }
             else if (word == "sphere") {
                 mScene.create_sphere(line.substr(word.length() + 1, std::string::npos));
@@ -73,7 +75,7 @@ void DriverHandler::read_driver() {
 
 
 void DriverHandler::output_result() {
-    mScene.output_image(mOutFileName);
+    mScene.render(mOutFileName);
 }
 
 
@@ -176,41 +178,40 @@ void DriverHandler::update_matrix(const std::string& line) {
 
 
 
+//======================================================================
+//======================================================================
+//======================================================================
+// EVERYTHING BELOW THIS POINT IS DEPRECATED AND UNUSED FROM P1
+//======================================================================
+//======================================================================
+//======================================================================
 
-void DriverHandler::load_object(const std::string& line) {
-    mObjects.emplace_back(line, mTransformationMatrix);
-}
-
-
-
-
-
-void DriverHandler::save_object(const std::string& line) {
-    std::string transformationFileName;
-    
-    size_t period = line.find('.');
-    if (period != std::string::npos) {
-        transformationFileName = line.substr(0, period+1) + "txt";
-    }
-    else {
-        transformationFileName = line + ".txt";
-    }
-    
-    size_t underscore = line.find('_');
-    if (underscore != std::string::npos) {
-        std::string end = transformationFileName.substr(underscore, std::string::npos);
-        transformationFileName = transformationFileName.substr(0, underscore) + "_transform" + end;
-    }
-    else {
-        transformationFileName = line.substr(0, period) + "_transform.txt";
-    }
-    
-    std::ofstream outTransformationFile(transformationFileName);
-    Object obj = mObjects.back();
-    mObjects.erase(mObjects.end());
-    
-    outTransformationFile << "# Transformation matrix\n" << mTransformationMatrix << "\n\n";
-    outTransformationFile << "# Sum absolute translations from original to transformed\n" << std::to_string(obj.sum_absolute_translations()) << "\n\n";
-    
-    obj.output(line);
-}
+//void DriverHandler::save_object(const std::string& line) {
+//    std::string transformationFileName;
+//    
+//    size_t period = line.find('.');
+//    if (period != std::string::npos) {
+//        transformationFileName = line.substr(0, period+1) + "txt";
+//    }
+//    else {
+//        transformationFileName = line + ".txt";
+//    }
+//    
+//    size_t underscore = line.find('_');
+//    if (underscore != std::string::npos) {
+//        std::string end = transformationFileName.substr(underscore, std::string::npos);
+//        transformationFileName = transformationFileName.substr(0, underscore) + "_transform" + end;
+//    }
+//    else {
+//        transformationFileName = line.substr(0, period) + "_transform.txt";
+//    }
+//    
+//    std::ofstream outTransformationFile(transformationFileName);
+//    Object obj = mObjects.back();
+//    mObjects.erase(mObjects.end());
+//    
+//    outTransformationFile << "# Transformation matrix\n" << mTransformationMatrix << "\n\n";
+//    outTransformationFile << "# Sum absolute translations from original to transformed\n" << std::to_string(obj.sum_absolute_translations()) << "\n\n";
+//    
+//    obj.output(line);
+//}
