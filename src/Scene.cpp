@@ -259,6 +259,14 @@ void Scene::raytrace(Ray& ray, Eigen::Vector3d& accumulation, Eigen::Vector3d& r
             
             if (!blocked) {
                 surfaceProjection = surfaceNormal.dot(pointToLight);
+                if (surfaceProjection < 0.0 && !pSphere) {
+                    Eigen::Vector3d temp = surfaceNormal;
+                    surfaceNormal(0) = -1 * temp(0);
+                    surfaceNormal(1) = -1 * temp(1);
+                    surfaceNormal(2) = -1 * temp(2);
+                    surfaceProjection = surfaceNormal.dot(pointToLight);
+                }
+                
                 if (surfaceProjection > 0.0) {
                     color(0) += light.mColor(0) * matDiffuse(0) * surfaceProjection;
                     color(1) += light.mColor(1) * matDiffuse(1) * surfaceProjection;
