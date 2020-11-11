@@ -224,13 +224,6 @@ void Scene::raytrace(Ray& ray, Eigen::Vector3d& accumulation, Eigen::Vector3d& r
             }
         }
         
-        // Hack for two face intersection
-        Eigen::Vector3d pointToCamera = bestPoint - mCamera.mEyePosition;
-        pointToCamera = pointToCamera / pointToCamera.norm();
-        if (pointToCamera.dot(surfaceNormal) > 0.0) {
-            surfaceNormal = -1 * surfaceNormal;
-        }
-        
         color(0) = mAmbientLight.mColor(0) * matAmbient(0);
         color(1) = mAmbientLight.mColor(1) * matAmbient(1);
         color(2) = mAmbientLight.mColor(2) * matAmbient(2);
@@ -238,11 +231,20 @@ void Scene::raytrace(Ray& ray, Eigen::Vector3d& accumulation, Eigen::Vector3d& r
         Eigen::Vector3d pointToLight, pointToRay, spr;
         double surfaceProjection, cdr;
         
+        
         Ray rayToLight;
         double blockingT;
         std::shared_ptr<Object> pBlockingObject;
         Face blockingFace;
         bool blocked = false;
+        
+        pointToRay = ray.mPosition - bestPoint;
+        pointToRay = pointToRay / pointToRay.norm();
+        
+        // Hack for two faces
+        if (pointToRay.dot(surfaceNormal) < 0.0) {
+            surfaceNormal = -1 * surfaceNormal;
+        }
         
         for (auto light : mPointLights) {
             pBlockingObject = nullptr;
@@ -271,9 +273,6 @@ void Scene::raytrace(Ray& ray, Eigen::Vector3d& accumulation, Eigen::Vector3d& r
                     color(0) += light.mColor(0) * matDiffuse(0) * surfaceProjection;
                     color(1) += light.mColor(1) * matDiffuse(1) * surfaceProjection;
                     color(2) += light.mColor(2) * matDiffuse(2) * surfaceProjection;
-                    
-                    pointToRay = ray.mPosition - bestPoint;
-                    pointToRay = pointToRay / pointToRay.norm();
                     
                     spr = (2 * surfaceProjection * surfaceNormal) - pointToLight;
                     spr = spr / spr.norm();
