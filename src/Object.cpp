@@ -68,6 +68,10 @@ Object::Object(const std::string& fileName, const Eigen::Matrix4d& transformatio
         }
     }
     
+    for (Face& face : mFaces) {
+        face.calculate_average_vertex_normals(cutoffAngle);
+    }
+    
     objReader.close();
 }
 
@@ -80,13 +84,15 @@ void Object::handle_vertex(const std::string& info, const Eigen::Matrix4d& trans
     double x, y, z;
     
     infoStream >> x >> y >> z;
+    
     mOldHomogeneousVertices.emplace_back(x, y, z, 1.0);
     mHomogeneousVertices.emplace_back(x, y, z, 1.0);
     
     mHomogeneousVertices.back() = transformationMatrix * mHomogeneousVertices.back();
     
-    Eigen::Vector3d updatedVertex = mHomogeneousVertices.back().head<3>();
-    updatedVertex = updatedVertex / mHomogeneousVertices.back()(3);
+    Vertex updatedVertex;
+    updatedVertex.mPosition = mHomogeneousVertices.back().head<3>();
+    updatedVertex.mPosition = updatedVertex.mPosition / mHomogeneousVertices.back()(3);
     mVertices.emplace_back(updatedVertex);
 }
 
@@ -159,10 +165,12 @@ void Object::handle_face(const std::string& info) {
     std::istringstream iss(info);
     std::string vertexInfo;
     int vertexIndex;
+    int faceCount = mFaces.size();
     while(getline(iss, vertexInfo, ' ')) {
         std::istringstream vertexIndexer(vertexInfo);
         vertexIndexer >> vertexIndex;
         newFace.mVertexIndices.push_back(vertexIndex - 1);
+        mVertices[vertexIndex - 1].mFaceIndices.push_back(faceCount);
     }
     
     Eigen::Vector3d BA = (mHomogeneousVertices[newFace.mVertexIndices[1]] - mHomogeneousVertices[newFace.mVertexIndices[0]]).head<3>();
@@ -227,9 +235,9 @@ double Object::sum_absolute_translations() {
     
     for (size_t i = 0; i < mVertices.size(); i++) {
         
-        xDiff = fabs(mVertices[i](0) - mOldHomogeneousVertices[i](0));
-        yDiff = fabs(mVertices[i](1) - mOldHomogeneousVertices[i](1));
-        zDiff = fabs(mVertices[i](2) - mOldHomogeneousVertices[i](2));
+        xDiff = fabs(mVertices[i].mPosition(0) - mOldHomogeneousVertices[i](0));
+        yDiff = fabs(mVertices[i].mPosition(1) - mOldHomogeneousVertices[i](1));
+        zDiff = fabs(mVertices[i].mPosition(2) - mOldHomogeneousVertices[i](2));
         difference = xDiff + yDiff + zDiff;
         
         sum += difference;
@@ -250,9 +258,9 @@ void Object::output(const std::string& fileName) {
     
     for (size_t i = 0; i < mVertices.size(); i++) {
         outFile << "v "
-                << std::to_string(mVertices[i](0)) << ' '
-                << std::to_string(mVertices[i](1)) << ' '
-                << std::to_string(mVertices[i](2)) << '\n';
+                << std::to_string(mVertices[i].mPosition(0)) << ' '
+                << std::to_string(mVertices[i].mPosition(1)) << ' '
+                << std::to_string(mVertices[i].mPosition(2)) << '\n';
     }
     
     /*

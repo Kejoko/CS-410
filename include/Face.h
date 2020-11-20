@@ -20,12 +20,15 @@ public:
     Face();
     
     std::vector<int> mVertexIndices;
+    std::vector<Eigen::Vector3d> mAverageVertexNormals;
     Eigen::Vector3d mNormal;
     std::shared_ptr<Material> mMaterial;
     
     Object* mpObject;
     
     void ray_intersect(const Ray&, bool& hit, double& t);
+    void calculate_average_vertex_normals(double cutoffAngle);
+    Eigen::Vector3d calculate_point_normal(double beta, double gamma);
 };;
 
 #endif //FACE_H

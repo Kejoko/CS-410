@@ -17,6 +17,11 @@
 #include "Material.h"
 #include "Ray.h"
 
+struct Vertex_t {
+    Eigen::Vector3d mPosition;
+    std::vector<int> mFaceIndices;
+}; typedef Vertex_t Vertex;
+
 class Object : public std::enable_shared_from_this<Object> {
 public:
     static int msObjectCount;
@@ -31,7 +36,8 @@ public:
     std::shared_ptr<Material> mCurrentMaterial;
     std::vector<Eigen::Vector4d> mOldHomogeneousVertices;
     std::vector<Eigen::Vector4d> mHomogeneousVertices;
-    std::vector<Eigen::Vector3d> mVertices;
+//    std::vector<Eigen::Vector3d> mVertices;
+    std::vector<Vertex> mVertices;
     std::vector<Eigen::Vector4d> mVertexNormals;
     std::vector<Face> mFaces;
     std::string mSmoothing;

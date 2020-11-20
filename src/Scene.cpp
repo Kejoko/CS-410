@@ -209,6 +209,7 @@ void Scene::raytrace(Ray& ray, Eigen::Vector3d& accumulation, Eigen::Vector3d& r
         }
         else {
             surfaceNormal = bestFace.mNormal;
+//            surfaceNormal = bestFace.calculate_normal(0, 0); // Pass beta and gamma
             
             matAmbient = bestFace.mMaterial->mAmbient;
             matDiffuse = bestFace.mMaterial->mDiffuse;

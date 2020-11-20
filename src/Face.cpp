@@ -4,6 +4,8 @@
 
 #include "Face.h"
 
+#include <math.h>
+
 #include <iostream>
 
 #include <Eigen/Dense>
@@ -16,10 +18,48 @@ Face::Face() {
     
 }
 
+
+
+
+
+void Face::calculate_average_vertex_normals(double cutoffAngle) {
+    int count;
+    double cos_theta, theta;
+    Eigen::Vector3d sum;
+    Vertex* current_vertex;
+    Face* current_face;
+    for (int i = 0; i < mVertexIndices.size(); i++) {
+        count = 0;
+        sum << 0, 0, 0;
+        
+        current_vertex = &(mpObject->mVertices[mVertexIndices[i]]);
+        for (int j = 0; j < current_vertex->mFaceIndices.size(); j++) {
+            current_face = &(mpObject->mFaces[current_vertex->mFaceIndices[j]]);
+            
+            cos_theta = mNormal.dot(current_face->mNormal);
+            theta = acos(cos_theta) * (180 / M_PI);
+            
+            if (theta < mpObject->mCutoffAngle) {
+                sum += current_face->mNormal;
+                count++;
+            }
+        }
+        
+        sum /= count;
+        sum = sum / sum.norm();
+        
+        mAverageVertexNormals.push_back(sum);
+    }
+}
+
+
+
+
+
 void Face::ray_intersect(const Ray& ray, bool& hit, double& t) {
-    Eigen::Vector3d Av = mpObject->mVertices[mVertexIndices[0]];
-    Eigen::Vector3d Bv = mpObject->mVertices[mVertexIndices[1]];
-    Eigen::Vector3d Cv = mpObject->mVertices[mVertexIndices[2]];
+    Eigen::Vector3d Av = mpObject->mVertices[mVertexIndices[0]].mPosition;
+    Eigen::Vector3d Bv = mpObject->mVertices[mVertexIndices[1]].mPosition;
+    Eigen::Vector3d Cv = mpObject->mVertices[mVertexIndices[2]].mPosition;
     
     Eigen::Vector3d rayToA = Av - ray.mPosition;
     
@@ -46,4 +86,17 @@ void Face::ray_intersect(const Ray& ray, bool& hit, double& t) {
 //        std::cout << "Dv " << ray.mDirection(0) << ' ' << ray.mDirection(1) << ' ' << ray.mDirection(2) << '\n';
 //        std::cout << "MMt\n" << MMt << '\n';
     }
+}
+
+
+
+
+
+Eigen::Vector3d Face::calculate_point_normal(double beta, double gamma) {
+    Eigen::Vector3d normal;
+    
+    normal = (1.0 - beta - gamma) * mAverageVertexNormals[0] + beta * mAverageVertexNormals[1] + gamma * mAverageVertexNormals[2];
+    
+    normal = normal / normal.norm();
+    return normal;
 }
