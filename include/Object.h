@@ -23,9 +23,10 @@ public:
     int mObjectId;
     
     Object();
-    Object(const std::string& fileName, const Eigen::Matrix4d& transformationMatrix);
+    Object(const std::string& fileName, const Eigen::Matrix4d& transformationMatrix, double cutoffAngle);
     
     std::string mFileName;
+    double mCutoffAngle;
     std::vector<std::shared_ptr<Material>> mMaterialLibrary;
     std::shared_ptr<Material> mCurrentMaterial;
     std::vector<Eigen::Vector4d> mOldHomogeneousVertices;
