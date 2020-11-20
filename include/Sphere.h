@@ -22,6 +22,7 @@ public:
     Sphere(const std::string& line);
     
     double mRadius;
+    double mRefractionIndex;
     Eigen::Vector3d mPosition;
     Eigen::Vector3d mAmbientReflection;
     Eigen::Vector3d mDiffuseReflection;
