@@ -64,6 +64,9 @@ void DriverHandler::read_driver() {
             else if (word == "sphere") {
                 mScene.create_sphere(line.substr(word.length() + 1, std::string::npos));
             }
+            else if (word == "cutoffAngle") {
+                update_cutoff_angle(line.substr(word.length() + 1, std::string::npos));
+            }
         }
     }
     
@@ -173,6 +176,17 @@ void DriverHandler::update_matrix(const std::string& line) {
         
         mTransformationMatrix = modifier * mTransformationMatrix;
     }
+}
+
+
+
+
+
+void DriverHandler::update_cutoff_angle(const std::string& line) {
+    std::cout << "CUTOFF ANGLE\n";
+    std::istringstream iss(line);
+    iss >> mCuttoffAngle;
+    std::cout << mCuttoffAngle << '\n';
 }
 
 

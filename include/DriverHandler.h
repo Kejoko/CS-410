@@ -28,11 +28,15 @@ public:
     
     Scene mScene;
     
+    double mCuttoffAngle;
     Eigen::Matrix4d mTransformationMatrix;
     
     void read_driver();
     void output_result();
     void update_matrix(const std::string& line);
+    void update_cutoff_angle(const std::string& line);
+    
+    
     void load_object(const std::string& line);
     void save_object(const std::string& line);
 };
