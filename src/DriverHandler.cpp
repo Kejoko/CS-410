@@ -21,6 +21,7 @@ DriverHandler::DriverHandler(const std::string& inFileName, const std::string& o
     mOutFileName = outFileName;
     
     update_matrix("clear");
+    update_cutoff_angle("90");
 }
 
 
@@ -59,10 +60,13 @@ void DriverHandler::read_driver() {
                 update_matrix(line.substr(word.length() + 1, std::string::npos));
             }
             else if (word == "load") {
-                mScene.create_object(line.substr(word.length() + 1, std::string::npos), mTransformationMatrix);
+                mScene.create_object(line.substr(word.length() + 1, std::string::npos), mTransformationMatrix, mCuttoffAngle);
             }
             else if (word == "sphere") {
                 mScene.create_sphere(line.substr(word.length() + 1, std::string::npos));
+            }
+            else if (word == "cutoffAngle") {
+                update_cutoff_angle(line.substr(word.length() + 1, std::string::npos));
             }
         }
     }
@@ -173,6 +177,15 @@ void DriverHandler::update_matrix(const std::string& line) {
         
         mTransformationMatrix = modifier * mTransformationMatrix;
     }
+}
+
+
+
+
+
+void DriverHandler::update_cutoff_angle(const std::string& line) {
+    std::istringstream iss(line);
+    iss >> mCuttoffAngle;
 }
 
 

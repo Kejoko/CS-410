@@ -71,7 +71,7 @@ public:
     void create_ambient_light(const std::string& line);
     void create_point_light(const std::string& line);
     void create_sphere(const std::string& line);
-    void create_object(const std::string& line, const Eigen::Matrix4d& transformationMatrix);
+    void create_object(const std::string& line, const Eigen::Matrix4d& transformationMatrix, double cutoffAngle);
     
     Ray determine_pixelray(int pixw, int pixh);
     void raytrace(Ray& ray, Eigen::Vector3d& accumulation, Eigen::Vector3d& reflectance, int depth);

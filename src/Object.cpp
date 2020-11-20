@@ -26,8 +26,10 @@ Object::Object() {
     
 }
 
-Object::Object(const std::string& fileName, const Eigen::Matrix4d& transformationMatrix) {
+Object::Object(const std::string& fileName, const Eigen::Matrix4d& transformationMatrix, double cutoffAngle) {
     mObjectId = msObjectCount++;
+    
+    mCutoffAngle = cutoffAngle;
     
     std::istringstream fileNameStream(fileName);
     fileNameStream >> mFileName;

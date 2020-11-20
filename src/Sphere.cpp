@@ -28,6 +28,7 @@ Sphere::Sphere(const std::string& line) : Object() {
     iss >> mDiffuseReflection(0) >> mDiffuseReflection(1) >> mDiffuseReflection(2);
     iss >> mSpecularReflection(0) >> mSpecularReflection(1) >> mSpecularReflection(2);
     iss >> mAttenuationReflection(0) >> mAttenuationReflection(1) >> mAttenuationReflection(2);
+    iss >> mRefractionIndex;
 }
 
 

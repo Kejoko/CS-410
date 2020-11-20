@@ -122,8 +122,8 @@ void Scene::create_sphere(const std::string& line) {
 
 
 
-void Scene::create_object(const std::string& line, const Eigen::Matrix4d& transformationMatrix) {
-    std::shared_ptr<Object> newObject = std::make_shared<Object>(line, transformationMatrix);
+void Scene::create_object(const std::string& line, const Eigen::Matrix4d& transformationMatrix, double cutoffAngle) {
+    std::shared_ptr<Object> newObject = std::make_shared<Object>(line, transformationMatrix, cutoffAngle);
     mpObjects.push_back(newObject);
 }
 
