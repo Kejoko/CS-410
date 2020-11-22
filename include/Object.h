@@ -16,6 +16,7 @@
 #include "Face.h"
 #include "Material.h"
 #include "Ray.h"
+#include "Vertex.h"
 
 class Object : public std::enable_shared_from_this<Object> {
 public:
@@ -31,7 +32,7 @@ public:
     std::shared_ptr<Material> mCurrentMaterial;
     std::vector<Eigen::Vector4d> mOldHomogeneousVertices;
     std::vector<Eigen::Vector4d> mHomogeneousVertices;
-    std::vector<Eigen::Vector3d> mVertices;
+    std::vector<Vertex> mVertices;
     std::vector<Eigen::Vector4d> mVertexNormals;
     std::vector<Face> mFaces;
     std::string mSmoothing;
@@ -45,7 +46,7 @@ public:
     void handle_face(const std::string& info);
     void handle_line(const std::string& info);
     
-    virtual void ray_intersect(const Ray& ray, std::shared_ptr<Object>& pBestObject, Face& bestFace, double& bestT);
+    virtual void ray_intersect(const Ray& ray, std::shared_ptr<Object>& pBestObject, Face& bestFace, double& bestBeta, double& bestGamma, double& bestT);
     
     double sum_absolute_translations();
     void output(const std::string& fileName);

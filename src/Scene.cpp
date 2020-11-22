@@ -177,9 +177,10 @@ void Scene::raytrace(Ray& ray, Eigen::Vector3d& accumulation, Eigen::Vector3d& r
     Eigen::Vector3d surfaceNormal;
     bool hit = false;
     double bestT = DBL_MAX;
+    double bestBeta, bestGamma;
     
     for (auto pObject : mpObjects) {
-        pObject->ray_intersect(ray, pBestObject, bestFace, bestT);
+        pObject->ray_intersect(ray, pBestObject, bestFace, bestBeta, bestGamma, bestT);
         
         if (pBestObject != nullptr) {
             bestPoint = ray.mPosition + bestT * ray.mDirection;
@@ -208,8 +209,7 @@ void Scene::raytrace(Ray& ray, Eigen::Vector3d& accumulation, Eigen::Vector3d& r
             illumination = 3;
         }
         else {
-            surfaceNormal = bestFace.mNormal;
-            
+            surfaceNormal = bestFace.calculate_point_normal(bestBeta, bestGamma);
             matAmbient = bestFace.mMaterial->mAmbient;
             matDiffuse = bestFace.mMaterial->mDiffuse;
             matSpecular = bestFace.mMaterial->mSpecular;
@@ -258,7 +258,7 @@ void Scene::raytrace(Ray& ray, Eigen::Vector3d& accumulation, Eigen::Vector3d& r
             
             for (auto pObject : mpObjects) {
                 if (pObject != pBestObject) {
-                    pObject->ray_intersect(rayToLight, pBlockingObject, bestFace, blockingT);
+                    pObject->ray_intersect(rayToLight, pBlockingObject, bestFace, bestBeta, bestGamma, blockingT);
                     if (pBlockingObject != nullptr) {
                         blocked = true;
                         break;

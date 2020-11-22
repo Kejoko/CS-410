@@ -6,11 +6,16 @@ add_library(
   Material.cpp)
 
 add_library(
+  Vertex
+  Vertex.cpp)
+
+add_library(
   Face
   Face.cpp)
 target_link_libraries(
   Face
-  Material)
+  Material
+  Vertex)
 
 add_library(
   Object
@@ -18,6 +23,7 @@ add_library(
 target_link_libraries(
   Object
   Material
+  Vertex
   Face)
 
 add_library(
