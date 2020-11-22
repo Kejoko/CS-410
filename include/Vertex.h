@@ -6,7 +6,6 @@
 #define VERTEX_H
 
 #include <vector>
-//#include <unordered_map>
 
 #include <Eigen/Dense>
 
@@ -16,7 +15,6 @@ public:
     
     Eigen::Vector3d mPosition;
     std::vector<int> mFaceIndices;
-//    std::unordered_map<int, Eigen::Vector3d> mAverageNormals;
 };
 
 #endif //VERTEX_H

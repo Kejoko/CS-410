@@ -32,7 +32,6 @@ public:
     std::shared_ptr<Material> mCurrentMaterial;
     std::vector<Eigen::Vector4d> mOldHomogeneousVertices;
     std::vector<Eigen::Vector4d> mHomogeneousVertices;
-//    std::vector<Eigen::Vector3d> mVertices;
     std::vector<Vertex> mVertices;
     std::vector<Eigen::Vector4d> mVertexNormals;
     std::vector<Face> mFaces;
