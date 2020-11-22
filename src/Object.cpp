@@ -19,6 +19,7 @@
 #include "Face.h"
 #include "Material.h"
 #include "Ray.h"
+#include "Vertex.h"
 
 int Object::msObjectCount = 0;
 
@@ -69,7 +70,7 @@ Object::Object(const std::string& fileName, const Eigen::Matrix4d& transformatio
     }
     
     for (Face& face : mFaces) {
-        face.calculate_average_vertex_normals(cutoffAngle);
+        face.calculate_average_vertex_normals();
     }
     
     objReader.close();
@@ -162,10 +163,12 @@ void Object::update_current_material(const std::string& materialName) {
 void Object::handle_face(const std::string& info) {
     Face newFace;
     
+    int faceCount = mFaces.size();
+    newFace.mIndex = faceCount;
+    
     std::istringstream iss(info);
     std::string vertexInfo;
     int vertexIndex;
-    int faceCount = mFaces.size();
     while(getline(iss, vertexInfo, ' ')) {
         std::istringstream vertexIndexer(vertexInfo);
         vertexIndexer >> vertexIndex;
@@ -205,21 +208,24 @@ void Object::handle_line(const std::string& info) {
 
 
 
-void Object::ray_intersect(const Ray& ray, std::shared_ptr<Object>& pBestObject, Face& bestFace, double& bestT) {
+void Object::ray_intersect(const Ray& ray, std::shared_ptr<Object>& pBestObject, Face& bestFace, double& bestBeta, double& bestGamma, double& bestT) {
     bool hit;
     double t;
+    double beta, gamma;
     
     Eigen::Vector3d A, B, C, rtoa, result;
     Eigen::Matrix3d MM, MMinverse;
     
-    for (auto currFace : mFaces) {
+    for (Face& currFace : mFaces) {
         hit = false;
-        currFace.ray_intersect(ray, hit, t);
+        currFace.ray_intersect(ray, hit, t, beta, gamma);
         if (hit) {
             if (t > 0.000001 && t < bestT) {
                 pBestObject = shared_from_this();
                 bestT = t;
                 bestFace = currFace;
+                bestBeta = beta;
+                bestGamma = gamma;
             }
         }
     }

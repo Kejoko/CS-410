@@ -29,7 +29,7 @@ public:
     Eigen::Vector3d mSpecularReflection;
     Eigen::Vector3d mAttenuationReflection;
     
-    void ray_intersect(const Ray& ray, std::shared_ptr<Object>& pBestObject, Face& bestFace, double& bestT) override;
+    void ray_intersect(const Ray& ray, std::shared_ptr<Object>& pBestObject, Face& bestFace, double& bestBeta, double& bestGamma, double& bestT) override;
 };
 
 #endif //SPHERE_H

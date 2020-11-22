@@ -13,6 +13,7 @@
 #include "Material.h"
 #include "Object.h"
 #include "Ray.h"
+#include "Vertex.h"
 
 Face::Face() {
     
@@ -22,7 +23,7 @@ Face::Face() {
 
 
 
-void Face::calculate_average_vertex_normals(double cutoffAngle) {
+void Face::calculate_average_vertex_normals() {
     int count;
     double cos_theta, theta;
     Eigen::Vector3d sum;
@@ -30,14 +31,17 @@ void Face::calculate_average_vertex_normals(double cutoffAngle) {
     Face* current_face;
     for (int i = 0; i < mVertexIndices.size(); i++) {
         count = 0;
-        sum << 0, 0, 0;
+        sum(0) = 0.0;
+        sum(1) = 0.0;
+        sum(2) = 0.0;
         
         current_vertex = &(mpObject->mVertices[mVertexIndices[i]]);
+        
         for (int j = 0; j < current_vertex->mFaceIndices.size(); j++) {
             current_face = &(mpObject->mFaces[current_vertex->mFaceIndices[j]]);
             
             cos_theta = mNormal.dot(current_face->mNormal);
-            theta = acos(cos_theta) * (180 / M_PI);
+            theta = acos(cos_theta) * (180.0 / M_PI);
             
             if (theta < mpObject->mCutoffAngle) {
                 sum += current_face->mNormal;
@@ -56,13 +60,12 @@ void Face::calculate_average_vertex_normals(double cutoffAngle) {
 
 
 
-void Face::ray_intersect(const Ray& ray, bool& hit, double& t) {
+void Face::ray_intersect(const Ray& ray, bool& hit, double& t, double& beta, double& gamma) {
     Eigen::Vector3d Av = mpObject->mVertices[mVertexIndices[0]].mPosition;
     Eigen::Vector3d Bv = mpObject->mVertices[mVertexIndices[1]].mPosition;
     Eigen::Vector3d Cv = mpObject->mVertices[mVertexIndices[2]].mPosition;
     
     Eigen::Vector3d rayToA = Av - ray.mPosition;
-    
     
     Eigen::Matrix3d MMt;
     MMt <<  (Av-Bv)(0), (Av-Cv)(0), ray.mDirection(0),
@@ -73,8 +76,8 @@ void Face::ray_intersect(const Ray& ray, bool& hit, double& t) {
     
     Eigen::Vector3d result = MMi * rayToA;
     
-    double beta = result(0);
-    double gamma = result(1);
+    beta = result(0);
+    gamma = result(1);
     t = result(2);
     if ((beta > 0.0) && (gamma > 0.0) && ((beta + gamma) < 1.0) && (t > 0.0)) {
         hit = true;
