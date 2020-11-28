@@ -30,6 +30,9 @@ public:
     Eigen::Vector3d mAttenuationReflection;
     
     void ray_intersect(const Ray& ray, std::shared_ptr<Object>& pBestObject, Face& bestFace, double& bestBeta, double& bestGamma, double& bestT) override;
+    Eigen::Vector3d calculate_refraction_t_vector(const Eigen::Vector3d& W, const Eigen::Vector3d& N, double eta1, double eta2, bool& success);
+    Ray calculate_refraction_exit_ray(const Eigen::Vector3d& W, const Eigen::Vector3d& surfaceNormal, const Eigen::Vector3d& point, double eta1, double eta2, bool& success);
+    
 };
 
 #endif //SPHERE_H

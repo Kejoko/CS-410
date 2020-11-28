@@ -194,6 +194,7 @@ void Scene::raytrace(Ray& ray, Eigen::Vector3d& accumulation, Eigen::Vector3d& r
         Eigen::Vector3d matSpecular;
         Eigen::Vector3d matReflect;
         double specularExponent;
+        double refractionIndex = 0;
         int illumination;
         
         std::shared_ptr<Sphere> pSphere = std::dynamic_pointer_cast<Sphere>(pBestObject);
@@ -206,6 +207,7 @@ void Scene::raytrace(Ray& ray, Eigen::Vector3d& accumulation, Eigen::Vector3d& r
             matSpecular = pSphere->mSpecularReflection;
             matReflect = pSphere->mAttenuationReflection;
             specularExponent = 16;
+            refractionIndex = pSphere->mRefractionIndex;
             illumination = 3;
         }
         else {
@@ -246,7 +248,7 @@ void Scene::raytrace(Ray& ray, Eigen::Vector3d& accumulation, Eigen::Vector3d& r
             surfaceNormal = -1 * surfaceNormal;
         }
         
-        for (auto light : mPointLights) {
+        for (const PointLight& light : mPointLights) {
             pBlockingObject = nullptr;
             blocked = false;
             pointToLight = light.mPosition - bestPoint;
@@ -292,6 +294,14 @@ void Scene::raytrace(Ray& ray, Eigen::Vector3d& accumulation, Eigen::Vector3d& r
         color(1) *= reflectance(1);
         color(2) *= reflectance(2);
         
+//        if (pSphere) {
+//            color(0) *= matSpecular(0);
+//            color(1) *= matSpecular(1);
+//            color(2) *= matSpecular(2);
+//        }
+        
+//        std::cout << "Color: " << color(0) << ' ' << color(1) << ' ' << color(2) << '\n';
+        
         accumulation += color;
         
         if (depth > 0) {
@@ -301,11 +311,37 @@ void Scene::raytrace(Ray& ray, Eigen::Vector3d& accumulation, Eigen::Vector3d& r
             Eigen::Vector3d inverseRayDirection = -1 * ray.mDirection;
             recursiveRay.mDirection = 2 * surfaceNormal.dot(inverseRayDirection) * surfaceNormal - inverseRayDirection;
             
-            reflectance(0) *= matReflect(0);
-            reflectance(1) *= matReflect(1);
-            reflectance(2) *= matReflect(2);
+            Eigen::Vector3d reflect(0.0, 0.0, 0.0);
             
-            raytrace(recursiveRay, accumulation, reflectance, depth-1);
+            Eigen::Vector3d newReflectance = reflectance;
+            newReflectance(0) *= matReflect(0);
+            newReflectance(1) *= matReflect(1);
+            newReflectance(2) *= matReflect(2);
+            raytrace(recursiveRay, reflect, newReflectance, depth-1);
+            
+            accumulation(0) += reflectance(0) * matSpecular(0) * reflect(0);
+            accumulation(1) += reflectance(1) * matSpecular(1) * reflect(1);
+            accumulation(2) += reflectance(2) * matSpecular(2) * reflect(2);
+        }
+        
+        if (pSphere && depth > 0 && matSpecular.sum() < 3.0) {
+            Eigen::Vector3d inverseRayDirection = -1 * ray.mDirection;
+            bool success;
+            Ray refractionRay = pSphere->calculate_refraction_exit_ray(inverseRayDirection, surfaceNormal, bestPoint, refractionIndex, 1.0, success);
+            
+            if (success) {
+                Eigen::Vector3d through(0.0, 0.0, 0.0);
+                
+                Eigen::Vector3d newReflectance = reflectance;
+                newReflectance(0) *= matReflect(0);
+                newReflectance(1) *= matReflect(1);
+                newReflectance(2) *= matReflect(2);
+                raytrace(refractionRay, through, newReflectance, depth-1);
+                
+                accumulation(0) += reflectance(0) * (1.0 - matSpecular(0)) * through(0);
+                accumulation(1) += reflectance(1) * (1.0 - matSpecular(1)) * through(1);
+                accumulation(2) += reflectance(2) * (1.0 - matSpecular(2)) * through(2);
+            }
         }
     }
 }
@@ -323,6 +359,7 @@ void Scene::render(const std::string& imageName) {
     output << mImageWidth << ' ' << mImageHeight << ' ' << "255\n";
     for (int i = 0; i < mImageHeight; i++) {
         for (int j = 0; j < mImageWidth; j++) {
+            std::cout << i << " , " << j << '\n';
             ray = determine_pixelray(i, j);
             Eigen::Vector3d pixelColors(0.0, 0.0, 0.0);
             Eigen::Vector3d reflectance(1.0, 1.0, 1.0);
@@ -337,6 +374,7 @@ void Scene::render(const std::string& imageName) {
             else {
                 output << '\n';
             }
+            std::cout << "\n\n";
         }
     }
     
