@@ -189,7 +189,7 @@ void Scene::raytrace(Ray& ray, Eigen::Vector3d& accumulation, Eigen::Vector3d& r
     double bestT = DBL_MAX;
     double bestBeta, bestGamma;
     
-    for (auto pObject : mpObjects) {
+    for (auto& pObject : mpObjects) {
         pObject->ray_intersect(ray, pBestObject, bestFace, bestBeta, bestGamma, bestT);
         
         if (pBestObject != nullptr) {
@@ -269,7 +269,7 @@ void Scene::raytrace(Ray& ray, Eigen::Vector3d& accumulation, Eigen::Vector3d& r
             rayToLight.mPosition = bestPoint;
             rayToLight.mDirection = pointToLight;
              
-            for (auto pObject : mpObjects) {
+            for (auto& pObject : mpObjects) {
                 if (pObject != pBestObject) {
                     pObject->ray_intersect(rayToLight, pBlockingObject, bestFace, bestBeta, bestGamma, blockingT);
                     if (pBlockingObject != nullptr) {

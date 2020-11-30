@@ -43,7 +43,7 @@ void Face::calculate_average_vertex_normals() {
             cos_theta = mNormal.dot(current_face->mNormal);
             theta = acos(cos_theta) * (180.0 / M_PI);
             
-            if (theta < mpObject->mCutoffAngle) {
+            if (theta <= mpObject->mCutoffAngle) {
                 sum += current_face->mNormal;
                 count++;
             }
