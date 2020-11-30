@@ -71,7 +71,7 @@ Eigen::Vector3d Sphere::calculate_refraction_t_vector(const Eigen::Vector3d& W, 
     double radSq = (etaR * etaR) * (WN * WN - 1) + 1;
     
     Eigen::Vector3d T;
-    std::cout << "radsq " << radSq << '\n';
+    
     if (radSq < 0.0) {
         success = false;
         T(0) = 0.0;
@@ -84,7 +84,6 @@ Eigen::Vector3d Sphere::calculate_refraction_t_vector(const Eigen::Vector3d& W, 
         T = aVal * W + bVal * N;
     }
     
-    std::cout << "T " << T(0) << ' ' << T(1) << ' ' << T(2) << '\n';
     return T;
 }
 
@@ -105,14 +104,11 @@ Ray Sphere::calculate_refraction_exit_ray(const Eigen::Vector3d& W, const Eigen:
     success = true;
     
     Eigen::Vector3d normal = mPosition - point;
-    std::cout << "weird " << normal(0) << ' ' << normal(1) << ' ' << normal(2) << '\n';
     
     Eigen::Vector3d exitPoint = point + 2 * normal.dot(T1) * T1;
-    std::cout << "exit " << exitPoint(0) << ' ' << exitPoint(1) << ' ' << exitPoint(2) << '\n';
     
     Eigen::Vector3d normalIn = mPosition - exitPoint;
     normalIn = normalIn / normalIn.norm();
-    std::cout << "nin " << normalIn(0) << ' ' << normalIn(1) << ' ' << normalIn(2) << '\n';
     
     Eigen::Vector3d T2 = calculate_refraction_t_vector(-1 * T1, normalIn, eta1, eta2, subSuccess);
     

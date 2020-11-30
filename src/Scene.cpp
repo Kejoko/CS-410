@@ -168,6 +168,16 @@ Ray Scene::determine_pixelray(int pixh, int pixw) {
 
 
 
+
+Eigen::Vector3d Scene::illuminate_point(const Ray& ray, const std::shared_ptr<Object>& pBestObject) {
+    Eigen::Vector3d color;
+    
+    return color;
+}
+
+
+
+
 void Scene::raytrace(Ray& ray, Eigen::Vector3d& accumulation, Eigen::Vector3d& reflectance, int depth) {
     Eigen::Vector3d color(0.0, 0.0, 0.0);
     
@@ -251,13 +261,14 @@ void Scene::raytrace(Ray& ray, Eigen::Vector3d& accumulation, Eigen::Vector3d& r
         for (const PointLight& light : mPointLights) {
             pBlockingObject = nullptr;
             blocked = false;
+            
             pointToLight = light.mPosition - bestPoint;
             blockingT = pointToLight.norm();
             pointToLight = pointToLight / pointToLight.norm();
             
             rayToLight.mPosition = bestPoint;
             rayToLight.mDirection = pointToLight;
-            
+             
             for (auto pObject : mpObjects) {
                 if (pObject != pBestObject) {
                     pObject->ray_intersect(rayToLight, pBlockingObject, bestFace, bestBeta, bestGamma, blockingT);
@@ -294,34 +305,30 @@ void Scene::raytrace(Ray& ray, Eigen::Vector3d& accumulation, Eigen::Vector3d& r
         color(1) *= reflectance(1);
         color(2) *= reflectance(2);
         
-//        if (pSphere) {
-//            color(0) *= matSpecular(0);
-//            color(1) *= matSpecular(1);
-//            color(2) *= matSpecular(2);
-//        }
+//        color(0) *= reflectance(0) * matSpecular(0);
+//        color(1) *= reflectance(1) * matSpecular(1);
+//        color(2) *= reflectance(2) * matSpecular(2);
         
-//        std::cout << "Color: " << color(0) << ' ' << color(1) << ' ' << color(2) << '\n';
-        
-        accumulation += color;
+//        accumulation += color;
         
         if (depth > 0) {
-            Ray recursiveRay;
-            recursiveRay.mPosition = bestPoint;
+            Ray reflectionRay;
+            reflectionRay.mPosition = bestPoint;
             
             Eigen::Vector3d inverseRayDirection = -1 * ray.mDirection;
-            recursiveRay.mDirection = 2 * surfaceNormal.dot(inverseRayDirection) * surfaceNormal - inverseRayDirection;
+            reflectionRay.mDirection = 2 * surfaceNormal.dot(inverseRayDirection) * surfaceNormal - inverseRayDirection;
             
-            Eigen::Vector3d reflect(0.0, 0.0, 0.0);
+            Eigen::Vector3d reflectionAccumulation(0.0, 0.0, 0.0);
             
             Eigen::Vector3d newReflectance = reflectance;
             newReflectance(0) *= matReflect(0);
             newReflectance(1) *= matReflect(1);
             newReflectance(2) *= matReflect(2);
-            raytrace(recursiveRay, reflect, newReflectance, depth-1);
+            raytrace(reflectionRay, reflectionAccumulation, newReflectance, depth-1);
             
-            accumulation(0) += reflectance(0) * matSpecular(0) * reflect(0);
-            accumulation(1) += reflectance(1) * matSpecular(1) * reflect(1);
-            accumulation(2) += reflectance(2) * matSpecular(2) * reflect(2);
+            accumulation(0) += reflectance(0) * matSpecular(0) * reflectionAccumulation(0);
+            accumulation(1) += reflectance(1) * matSpecular(1) * reflectionAccumulation(1);
+            accumulation(2) += reflectance(2) * matSpecular(2) * reflectionAccumulation(2);
         }
         
         if (pSphere && depth > 0 && matSpecular.sum() < 3.0) {
@@ -330,19 +337,25 @@ void Scene::raytrace(Ray& ray, Eigen::Vector3d& accumulation, Eigen::Vector3d& r
             Ray refractionRay = pSphere->calculate_refraction_exit_ray(inverseRayDirection, surfaceNormal, bestPoint, refractionIndex, 1.0, success);
             
             if (success) {
-                Eigen::Vector3d through(0.0, 0.0, 0.0);
+                color(0) *= matSpecular(0);
+                color(1) *= matSpecular(1);
+                color(2) *= matSpecular(2);
+                
+                Eigen::Vector3d refractionAccumulation(0.0, 0.0, 0.0);
                 
                 Eigen::Vector3d newReflectance = reflectance;
                 newReflectance(0) *= matReflect(0);
                 newReflectance(1) *= matReflect(1);
                 newReflectance(2) *= matReflect(2);
-                raytrace(refractionRay, through, newReflectance, depth-1);
+                raytrace(refractionRay, refractionAccumulation, newReflectance, depth-1);
                 
-                accumulation(0) += reflectance(0) * (1.0 - matSpecular(0)) * through(0);
-                accumulation(1) += reflectance(1) * (1.0 - matSpecular(1)) * through(1);
-                accumulation(2) += reflectance(2) * (1.0 - matSpecular(2)) * through(2);
+                accumulation(0) += reflectance(0) * (1.0 - matSpecular(0)) * refractionAccumulation(0);
+                accumulation(1) += reflectance(1) * (1.0 - matSpecular(1)) * refractionAccumulation(1);
+                accumulation(2) += reflectance(2) * (1.0 - matSpecular(2)) * refractionAccumulation(2);
             }
         }
+        
+        accumulation += color;
     }
 }
 
@@ -359,7 +372,6 @@ void Scene::render(const std::string& imageName) {
     output << mImageWidth << ' ' << mImageHeight << ' ' << "255\n";
     for (int i = 0; i < mImageHeight; i++) {
         for (int j = 0; j < mImageWidth; j++) {
-            std::cout << i << " , " << j << '\n';
             ray = determine_pixelray(i, j);
             Eigen::Vector3d pixelColors(0.0, 0.0, 0.0);
             Eigen::Vector3d reflectance(1.0, 1.0, 1.0);
@@ -374,7 +386,6 @@ void Scene::render(const std::string& imageName) {
             else {
                 output << '\n';
             }
-            std::cout << "\n\n";
         }
     }
     
