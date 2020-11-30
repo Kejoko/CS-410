@@ -4,6 +4,8 @@
 
 #include "Sphere.h"
 
+#include <math.h>
+
 #include <cfloat>
 
 #include <iostream>
@@ -56,4 +58,61 @@ void Sphere::ray_intersect(const Ray& ray, std::shared_ptr<Object>& pBestObject,
             pBestObject = shared_from_this();
         }
     }
+}
+
+
+
+
+
+Eigen::Vector3d Sphere::calculate_refraction_t_vector(const Eigen::Vector3d& W, const Eigen::Vector3d& N, double eta1, double eta2, bool& success) {
+    double etaR = eta1 / eta2;
+    double aVal = -1 * etaR;
+    double WN = W.dot(N);
+    double radSq = (etaR * etaR) * (WN * WN - 1) + 1;
+    
+    Eigen::Vector3d T;
+    
+    if (radSq < 0.0) {
+        success = false;
+        T(0) = 0.0;
+        T(1) = 0.0;
+        T(2) = 0.0;
+    }
+    else {
+        success = true;
+        double bVal = (etaR * WN) - sqrt(radSq);
+        T = aVal * W + bVal * N;
+    }
+    
+    return T;
+}
+
+
+
+
+
+Ray Sphere::calculate_refraction_exit_ray(const Eigen::Vector3d& W, const Eigen::Vector3d& surfaceNormal, const Eigen::Vector3d& point, double eta1, double eta2, bool& success) {
+    Ray refractionRay;
+    
+    bool subSuccess;
+    Eigen::Vector3d T1 = calculate_refraction_t_vector(W, surfaceNormal, eta2, eta1, subSuccess);
+    
+    if (!subSuccess) {
+        success = false;
+        return refractionRay;
+    }
+    success = true;
+    
+    Eigen::Vector3d normal = mPosition - point;
+    
+    Eigen::Vector3d exitPoint = point + 2 * normal.dot(T1) * T1;
+    
+    Eigen::Vector3d normalIn = mPosition - exitPoint;
+    normalIn = normalIn / normalIn.norm();
+    
+    Eigen::Vector3d T2 = calculate_refraction_t_vector(-1 * T1, normalIn, eta1, eta2, subSuccess);
+    
+    refractionRay.mPosition = exitPoint;
+    refractionRay.mDirection = T2;
+    return refractionRay;
 }

@@ -74,6 +74,7 @@ public:
     void create_object(const std::string& line, const Eigen::Matrix4d& transformationMatrix, double cutoffAngle);
     
     Ray determine_pixelray(int pixw, int pixh);
+    Eigen::Vector3d illuminate_point(const Ray& ray, const std::shared_ptr<Object>& pBestObject);
     void raytrace(Ray& ray, Eigen::Vector3d& accumulation, Eigen::Vector3d& reflectance, int depth);
     void render(const std::string& imageName);
 };
