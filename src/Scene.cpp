@@ -344,9 +344,9 @@ void Scene::raytrace(Ray& ray, Eigen::Vector3d& accumulation, Eigen::Vector3d& r
                 Eigen::Vector3d refractionAccumulation(0.0, 0.0, 0.0);
                 
                 Eigen::Vector3d newReflectance = reflectance;
-                if (matReflect(0) != 0.0) newReflectance(0) *= matReflect(0);
-                if (matReflect(1) != 0.0) newReflectance(1) *= matReflect(1);
-                if (matReflect(2) != 0.0) newReflectance(2) *= matReflect(2);
+                newReflectance(0) *= (1 - matSpecular(0));
+                newReflectance(1) *= (1 - matSpecular(1));
+                newReflectance(2) *= (1 - matSpecular(2));
                 raytrace(refractionRay, refractionAccumulation, newReflectance, depth-1);
                 
                 accumulation(0) += reflectance(0) * (1.0 - matSpecular(0)) * refractionAccumulation(0);
@@ -372,6 +372,17 @@ void Scene::render(const std::string& imageName) {
     output << mImageWidth << ' ' << mImageHeight << ' ' << "255\n";
     for (int i = 0; i < mImageHeight; i++) {
         for (int j = 0; j < mImageWidth; j++) {
+            if ((i >= 23 && i <= 25) && (j >= 9 && j <= 11)) {
+                PRINT = true;
+            }
+            else {
+                PRINT = false;
+            }
+            
+            if (PRINT) {
+                std::cout << "\n\n\n***** ***** ***** ***** " << i << " , " << j << '\n';
+            }
+            
             ray = determine_pixelray(i, j);
             Eigen::Vector3d pixelColors(0.0, 0.0, 0.0);
             Eigen::Vector3d reflectance(1.0, 1.0, 1.0);

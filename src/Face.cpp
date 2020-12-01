@@ -15,6 +15,8 @@
 #include "Ray.h"
 #include "Vertex.h"
 
+bool PRINT = false;
+
 Face::Face() {
     
 }
@@ -100,6 +102,12 @@ Eigen::Vector3d Face::calculate_point_normal(double beta, double gamma) {
     
     normal = (1.0 - beta - gamma) * mAverageVertexNormals[0] + beta * mAverageVertexNormals[1] + gamma * mAverageVertexNormals[2];
     
-    normal = normal / normal.norm();
+//    normal = normal / normal.norm();
+    
+    if (PRINT) {
+        std::cout << "beta  " << beta << "\ngamma " << gamma << '\n';
+        std::cout << "sumN  " << normal(0) << ' ' << normal(1) << ' ' << normal(2) << '\n';
+    }
+    
     return normal;
 }
