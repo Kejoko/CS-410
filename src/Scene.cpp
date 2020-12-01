@@ -280,9 +280,11 @@ void Scene::raytrace(Ray& ray, Eigen::Vector3d& accumulation, Eigen::Vector3d& r
             }
             
             if (!blocked) {
+                
                 surfaceProjection = surfaceNormal.dot(pointToLight);
                 
                 if (surfaceProjection > 0.0) {
+                    
                     color(0) += light.mColor(0) * matDiffuse(0) * surfaceProjection;
                     color(1) += light.mColor(1) * matDiffuse(1) * surfaceProjection;
                     color(2) += light.mColor(2) * matDiffuse(2) * surfaceProjection;
@@ -372,17 +374,6 @@ void Scene::render(const std::string& imageName) {
     output << mImageWidth << ' ' << mImageHeight << ' ' << "255\n";
     for (int i = 0; i < mImageHeight; i++) {
         for (int j = 0; j < mImageWidth; j++) {
-            if ((i >= 23 && i <= 25) && (j >= 9 && j <= 11)) {
-                PRINT = true;
-            }
-            else {
-                PRINT = false;
-            }
-            
-            if (PRINT) {
-                std::cout << "\n\n\n***** ***** ***** ***** " << i << " , " << j << '\n';
-            }
-            
             ray = determine_pixelray(i, j);
             Eigen::Vector3d pixelColors(0.0, 0.0, 0.0);
             Eigen::Vector3d reflectance(1.0, 1.0, 1.0);

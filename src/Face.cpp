@@ -15,8 +15,6 @@
 #include "Ray.h"
 #include "Vertex.h"
 
-bool PRINT = false;
-
 Face::Face() {
     
 }
@@ -83,13 +81,6 @@ void Face::ray_intersect(const Ray& ray, bool& hit, double& t, double& beta, dou
     t = result(2);
     if ((beta > 0.0) && (gamma > 0.0) && ((beta + gamma) < 1.0) && (t > 0.0)) {
         hit = true;
-        
-//        std::cout << "----- HIT -----\t" << t << '\n';
-//        std::cout << "Av " << Av(0) << ' ' << Av(1) << ' ' << Av(2) << '\n';
-//        std::cout << "Bv " << Bv(0) << ' ' << Bv(1) << ' ' << Bv(2) << '\n';
-//        std::cout << "Cv " << Cv(0) << ' ' << Cv(1) << ' ' << Cv(2) << '\n';
-//        std::cout << "Dv " << ray.mDirection(0) << ' ' << ray.mDirection(1) << ' ' << ray.mDirection(2) << '\n';
-//        std::cout << "MMt\n" << MMt << '\n';
     }
 }
 
@@ -102,12 +93,7 @@ Eigen::Vector3d Face::calculate_point_normal(double beta, double gamma) {
     
     normal = (1.0 - beta - gamma) * mAverageVertexNormals[0] + beta * mAverageVertexNormals[1] + gamma * mAverageVertexNormals[2];
     
-//    normal = normal / normal.norm();
-    
-    if (PRINT) {
-        std::cout << "beta  " << beta << "\ngamma " << gamma << '\n';
-        std::cout << "sumN  " << normal(0) << ' ' << normal(1) << ' ' << normal(2) << '\n';
-    }
+    normal = normal / normal.norm();
     
     return normal;
 }

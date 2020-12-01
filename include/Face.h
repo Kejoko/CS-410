@@ -14,8 +14,6 @@
 #include "Ray.h"
 #include "Vertex.h"
 
-extern bool PRINT;
-
 class Object;
 
 class Face {
