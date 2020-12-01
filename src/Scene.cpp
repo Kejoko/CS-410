@@ -280,9 +280,11 @@ void Scene::raytrace(Ray& ray, Eigen::Vector3d& accumulation, Eigen::Vector3d& r
             }
             
             if (!blocked) {
+                
                 surfaceProjection = surfaceNormal.dot(pointToLight);
                 
                 if (surfaceProjection > 0.0) {
+                    
                     color(0) += light.mColor(0) * matDiffuse(0) * surfaceProjection;
                     color(1) += light.mColor(1) * matDiffuse(1) * surfaceProjection;
                     color(2) += light.mColor(2) * matDiffuse(2) * surfaceProjection;
@@ -344,9 +346,9 @@ void Scene::raytrace(Ray& ray, Eigen::Vector3d& accumulation, Eigen::Vector3d& r
                 Eigen::Vector3d refractionAccumulation(0.0, 0.0, 0.0);
                 
                 Eigen::Vector3d newReflectance = reflectance;
-                if (matReflect(0) != 0.0) newReflectance(0) *= matReflect(0);
-                if (matReflect(1) != 0.0) newReflectance(1) *= matReflect(1);
-                if (matReflect(2) != 0.0) newReflectance(2) *= matReflect(2);
+                newReflectance(0) *= (1 - matSpecular(0));
+                newReflectance(1) *= (1 - matSpecular(1));
+                newReflectance(2) *= (1 - matSpecular(2));
                 raytrace(refractionRay, refractionAccumulation, newReflectance, depth-1);
                 
                 accumulation(0) += reflectance(0) * (1.0 - matSpecular(0)) * refractionAccumulation(0);

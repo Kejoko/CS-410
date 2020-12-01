@@ -12,7 +12,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-#set(CMAKE_CXX_FLAGS "-Wall -Werror -Wextra -Wpedantic")
+#set(CMAKE_CXX_FLAGS "-Ofast -Wall -Werror -Wextra -Wpedantic")
 
 #======================================================================
 # Include project dependencies
