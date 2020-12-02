@@ -346,9 +346,9 @@ void Scene::raytrace(Ray& ray, Eigen::Vector3d& accumulation, Eigen::Vector3d& r
                 Eigen::Vector3d refractionAccumulation(0.0, 0.0, 0.0);
                 
                 Eigen::Vector3d newReflectance = reflectance;
-                newReflectance(0) *= (1 - matSpecular(0));
-                newReflectance(1) *= (1 - matSpecular(1));
-                newReflectance(2) *= (1 - matSpecular(2));
+                newReflectance(0) *= (1 - matReflect(0));
+                newReflectance(1) *= (1 - matReflect(1));
+                newReflectance(2) *= (1 - matReflect(2));
                 raytrace(refractionRay, refractionAccumulation, newReflectance, depth-1);
                 
                 accumulation(0) += reflectance(0) * (1.0 - matSpecular(0)) * refractionAccumulation(0);
