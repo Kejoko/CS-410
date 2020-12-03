@@ -31,3 +31,9 @@ kkochis@rams.colostate.edu
 	EX: ./raytracer driver00.txt driver00.ppm
 	EX: ./raytracer ~/Documents/drivers/driver12.txt ~/Desktop/output.ppm
 	EX: ./build/raytracer ../driver1000.txt ../solutions/driver1000.ppm
+
+----- RUNTIME INFORMATION -----
+driver01.txt
+	* Highest resolution under 10 minutes : 128 x 128
+driver02.txt
+	* Highest resolution under 10 minutes : 96 x 96

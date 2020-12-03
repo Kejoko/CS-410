@@ -1,10 +1,7 @@
 camera 50 50 75 50 50 10 0 1 0 -5
 bounds -3.6 3.6 -3.6 3.6
 res 256 256
-#res 128 128
-#res 64 64
 recursionlevel 5
-#recursionlevel 0
 ambient 0.0 0.0 0.0
 light 10 10 100 1 0.5 0.5 0.5
 light 90 90 100 1 0.5 0.5 0.5
