@@ -11,8 +11,7 @@ tar -cvf ~/Desktop/KeeganKochis04.tar \
     raytracer.cpp \
     CMakeLists.txt \
     README.txt \
-    driver00.txt \
-    driver01.txt \
-    driver01.ppm \
-    driver02.txt \
-    driver02.ppm
+    driver* \
+    sphere* \
+    checkerGray* \
+    cow*
