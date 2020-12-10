@@ -4,14 +4,18 @@
 # The resulting tar file will end up on the desktop
 
 # Tar the files
-tar -cvf ~/Desktop/KeeganKochis04.tar \
+tar -cvf ~/Desktop/KeeganKochis05.tar \
     dependencies \
     include \
     src \
     raytracer.cpp \
     CMakeLists.txt \
     README.txt \
-    driver* \
-    sphere* \
-    checkerGray* \
-    cow*
+    cloud* \
+    fence* \
+    hand* \
+    my* \
+    skybox* \
+    scene* \
+    reference.png \
+    

@@ -5,7 +5,7 @@ kkochis@rams.colostate.edu
 
 ----- COMPILATION INSTRUCTIONS -----
 1. Open a terminal and `cd` into the directory containing the contents of the tar
-   file (the directory with the contents of "KeeganKochis04.tar")
+   file (the directory with the contents of "KeeganKochis05.tar")
 2. Run the command 'mkdir build; cd build`
 	* We will compile in the "build" directory in order to prevent cmake and make
 	  from polluting the top level directory
