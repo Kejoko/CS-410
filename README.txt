@@ -32,8 +32,16 @@ kkochis@rams.colostate.edu
 	EX: ./raytracer ~/Documents/drivers/driver12.txt ~/Desktop/output.ppm
 	EX: ./build/raytracer ../driver1000.txt ../solutions/driver1000.ppm
 
------ RUNTIME INFORMATION -----
-driver01.txt
-	* Highest resolution under 10 minutes : 128 x 128
-driver02.txt
-	* Highest resolution under 10 minutes : 96 x 96
+----- SCENE INFORMATION -----
+scene1.txt
+	* Rendering in 1024x1024 took 5 hours and 14 minutes on my laptop
+	* The cube is rendered with flat shading and can be seen refracting through a
+	  sphere. In the bottom left a smooth shaded icosphere can be seen in blue.
+scene2.txt
+	* Rendering in 1024x1024 took 9 hours and 32 minutes on my laptop
+	* I attempted to recreate the refraction example image showed in
+	  lecture (the glass ball on the beach), in the reference.png file.
+	  I would have liked to added more objects on the horizon line as shown
+	  in the reference image but I chose to go with spheres due to the already
+	  high rendering time. I'm not proud of the hand object I created for this
+	  scene. My 3d modeling skills aren't the greatest.
