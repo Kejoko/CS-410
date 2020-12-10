@@ -1,0 +1,14 @@
+# Blender MTL File: 'two_triangles.blend'
+# Material Count: 1
+
+newmtl Material.001
+Ns 96.0
+Ka 0.61960784313 0.86666666666 1.0
+Kd 0.61960784313 0.86666666666 1.0
+Ks 0.61960784313 0.86666666666 1.0
+Ke 0.500000 0.500000 0.500000
+Ni 1.000000
+d 1.000000
+illum 2
+
+
